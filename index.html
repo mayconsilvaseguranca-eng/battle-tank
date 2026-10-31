@@ -139,6 +139,23 @@ html.swap #zMove{left:auto;right:0}html.swap #zFire{right:auto;left:0}
 #joy .l{top:50%;left:6px;margin-top:-9px;border-right:11px solid rgba(236,230,210,.5);border-left:0}
 #joy .r{top:50%;right:6px;margin-top:-9px;border-left:11px solid rgba(236,230,210,.5);border-right:0}
 #joy .u.on{border-bottom-color:var(--gold)}#joy .d.on{border-top-color:var(--gold)}#joy .l.on{border-right-color:var(--gold)}#joy .r.on{border-left-color:var(--gold)}
+#dpad{--dp:calc(156px*var(--cs,1));position:absolute;left:0;top:0;width:var(--dp);height:var(--dp);transform:translate(-50%,-50%);opacity:var(--co,.7);pointer-events:none;display:none;filter:drop-shadow(0 3px 0 rgba(0,0,0,.45))}
+html.dpad #dpad{display:block}html.dpad #joy{display:none}
+#dpad b,#dpad .c{position:absolute;background:#2a2e39}
+#dpad b{border:2px solid #555b6b}
+#dpad .u{left:33%;top:0;width:34%;height:37%;border-bottom:0;border-radius:7px 7px 0 0}
+#dpad .d{left:33%;bottom:0;width:34%;height:37%;border-top:0;border-radius:0 0 7px 7px}
+#dpad .l{left:0;top:33%;width:37%;height:34%;border-right:0;border-radius:7px 0 0 7px}
+#dpad .r{right:0;top:33%;width:37%;height:34%;border-left:0;border-radius:0 7px 7px 0}
+#dpad .c{left:calc(33% + 2px);top:calc(33% + 2px);width:calc(34% - 4px);height:calc(34% - 4px);background:radial-gradient(circle,#20232c 0 34%,#2a2e39 36%)}
+#dpad s{position:absolute;left:50%;top:50%;width:0;height:0;border:calc(10px*var(--cs,1)) solid transparent;transform:translate(-50%,-50%)}
+#dpad .u s{border-bottom:calc(13px*var(--cs,1)) solid #c9c4b2;border-top:0}
+#dpad .d s{border-top:calc(13px*var(--cs,1)) solid #c9c4b2;border-bottom:0}
+#dpad .l s{border-right:calc(13px*var(--cs,1)) solid #c9c4b2;border-left:0}
+#dpad .r s{border-left:calc(13px*var(--cs,1)) solid #c9c4b2;border-right:0}
+#dpad b.on{background:#3b404e}
+#dpad .u.on s{border-bottom-color:var(--gold)}#dpad .d.on s{border-top-color:var(--gold)}#dpad .l.on s{border-right-color:var(--gold)}#dpad .r.on s{border-left-color:var(--gold)}
+#dpad .u.on,#dpad .d.on,#dpad .l.on,#dpad .r.on{box-shadow:inset 0 0 0 2px rgba(242,194,48,.35)}
 #fireBtn{position:absolute;left:0;top:0;width:var(--fs);height:var(--fs);border-radius:50%;background:var(--red);border:3px solid #ff8a80;color:#fff;font-family:var(--fd);font-size:calc(11px*var(--cs,1));display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);opacity:var(--co,.7);pointer-events:none;box-shadow:inset 0 -6px 0 rgba(0,0,0,.3)}
 #fireBtn.on{transform:translate(-50%,-46%) scale(.93);filter:brightness(1.3)}
 /* phone: playfield fills the screen, HUD floats over the top edge */
@@ -279,6 +296,7 @@ html.coarse #feed div{font-size:15px;padding:2px 6px}
     <div id="touch">
       <div class="tz" id="zMove"></div>
       <div class="tz" id="zFire"></div>
+      <div id="dpad"><b class="u"><s></s></b><b class="r"><s></s></b><b class="d"><s></s></b><b class="l"><s></s></b><i class="c"></i></div>
       <div id="joy" class="idle"><b class="u"></b><b class="r"></b><b class="d"></b><b class="l"></b><div id="knob"></div></div>
       <div id="fireBtn">FOGO</div>
     </div>
@@ -288,8 +306,8 @@ html.coarse #feed div{font-size:15px;padding:2px 6px}
   <div class="panel">
     <h2>OPÇÕES</h2>
     <div class="set">
-      <div class="k">ANALÓGICO</div><div class="seg" id="oSide"><button data-v="left">Esquerda</button><button data-v="right">Direita</button></div>
-      <div class="k">TIPO</div><div class="seg" id="oJoy"><button data-v="float">Flutuante</button><button data-v="fixed">Fixo</button></div>
+      <div class="k">MOVIMENTO</div><div class="seg" id="oSide"><button data-v="left">Esquerda</button><button data-v="right">Direita</button></div>
+      <div class="k">TIPO</div><div class="seg" id="oJoy"><button data-v="dpad">Setas</button><button data-v="float">Analógico</button><button data-v="fixed">Analógico fixo</button></div>
       <div class="k">TAMANHO</div><div class="seg" id="oSize"><button data-v="0.8">P</button><button data-v="1">M</button><button data-v="1.25">G</button></div>
       <div class="k">VISIBILIDADE</div><div class="seg" id="oOp"><button data-v="0.45">Leve</button><button data-v="0.7">Média</button><button data-v="0.95">Forte</button></div>
       <div class="k">SENSIBILIDADE</div><div class="seg" id="oDead"><button data-v="0.32">Baixa</button><button data-v="0.2">Média</button><button data-v="0.1">Alta</button></div>
@@ -297,7 +315,7 @@ html.coarse #feed div{font-size:15px;padding:2px 6px}
       <div class="k">TIRO NO TECLADO</div><div class="seg"><button id="oKey">ESPAÇO</button></div>
     </div>
     <div class="preview" aria-hidden="true"><div class="pvm"></div><i class="pvj"></i><i class="pvf"></i></div>
-    <div class="note" style="text-align:center">O botão de tiro fica do lado oposto ao analógico. No flutuante, o analógico aparece onde você encosta o dedo; no fixo, fica sempre no mesmo lugar.</div>
+    <div class="note" style="text-align:center">O botão de tiro fica do lado oposto ao movimento. Nas setas, dá para deslizar o dedo de uma seta para outra sem soltar. A sensibilidade vale para o analógico.</div>
     <button class="btn go" id="oClose">Pronto</button>
   </div>
 </div>
@@ -546,16 +564,17 @@ document.querySelectorAll('canvas.sw').forEach(cv=>{const c=cv.getContext('2d'),
 
 /* ---------- options ---------- */
 const root=document.documentElement;
-const OPT_DEF={side:'left',joy:'float',size:1,op:.7,dead:.2,vib:1,fireKey:'Space'};
+const OPT_DEF={side:'left',joy:'dpad',size:1,op:.7,dead:.2,vib:1,fireKey:'Space'};
 const opt=Object.assign({},OPT_DEF,store.get('opt',{}));
+if(!opt.v2){opt.joy='dpad';opt.v2=1;store.set('opt',opt)} // setas viraram o padrão
 let rebinding=false;
 const keyLabel=c=>c==='Space'?'ESPAÇO':String(c).replace(/^Key|^Digit|^Numpad/,'').replace(/(Left|Right)$/,'').toUpperCase();
-function applyOpts(){root.classList.toggle('swap',opt.side==='right');const t=$('#touch');t.style.setProperty('--cs',opt.size);t.style.setProperty('--co',opt.op);
+function applyOpts(){root.classList.toggle('swap',opt.side==='right');root.classList.toggle('dpad',opt.joy==='dpad');const t=$('#touch');t.style.setProperty('--cs',opt.size);t.style.setProperty('--co',opt.op);
   for(const [id,k] of [['#oSide','side'],['#oJoy','joy'],['#oSize','size'],['#oOp','op'],['#oDead','dead'],['#oVib','vib']])
     $(id).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===String(opt[k])));
   $('#oKey').textContent=rebinding?'APERTE UMA TECLA…':keyLabel(opt.fireKey);$('#kFire').textContent=keyLabel(opt.fireKey);
   const L=opt.side==='left',js=22*opt.size,fs=17*opt.size;
-  Object.assign(document.querySelector('.pvj').style,{left:(L?12:88)+'%',width:js+'px',height:js+'px',opacity:.4+opt.op*.6});
+  Object.assign(document.querySelector('.pvj').style,{borderRadius:opt.joy==='dpad'?'3px':'50%',left:(L?12:88)+'%',width:js+'px',height:js+'px',opacity:.4+opt.op*.6});
   Object.assign(document.querySelector('.pvf').style,{left:(L?88:12)+'%',width:fs+'px',height:fs+'px',opacity:.4+opt.op*.6});
   placeControls()}
 for(const [id,k] of [['#oSide','side'],['#oJoy','joy'],['#oSize','size'],['#oOp','op'],['#oDead','dead'],['#oVib','vib']])
@@ -587,11 +606,15 @@ const J={id:null,cx:0,cy:0,hx:0,hy:0};const fireIds=new Set();
 function vib(ms){if(opt.vib&&navigator.vibrate)try{navigator.vibrate(ms)}catch(e){}}
 function setJoy(x,y){J.cx=x;J.cy=y;joyEl.style.left=x+'px';joyEl.style.top=y+'px'}
 function placeControls(){const g=$('#game').getBoundingClientRect();if(!g.width)return;
-  const js=124*opt.size,fs=96*opt.size,L=opt.side==='left',mx=Math.max(26,g.width*.045);
+  const js=(opt.joy==='dpad'?156:124)*opt.size,fs=96*opt.size,L=opt.side==='left',mx=Math.max(26,g.width*.045);
   J.hx=L?mx+js/2:g.width-mx-js/2;J.hy=g.height-Math.max(20,g.height*.07)-js/2;
   const fx=L?g.width-mx-fs/2:mx+fs/2,fy=g.height-Math.max(26,g.height*.1)-fs/2;
-  if(J.id===null)setJoy(J.hx,J.hy);fireEl.style.left=fx+'px';fireEl.style.top=fy+'px'}
-function showDir(nd){if(nd!==touchDir){if(nd>=0)vib(8);touchDir=nd;joyEl.querySelectorAll('b').forEach((b,i)=>b.classList.toggle('on',i===nd))}}
+  if(J.id===null)setJoy(J.hx,J.hy);const dp=$('#dpad');dp.style.left=J.hx+'px';dp.style.top=J.hy+'px';fireEl.style.left=fx+'px';fireEl.style.top=fy+'px'}
+function showDir(nd){if(nd!==touchDir){if(nd>=0)vib(8);touchDir=nd;for(const el of [joyEl,$('#dpad')])el.querySelectorAll('b').forEach((b,i)=>b.classList.toggle('on',i===nd))}}
+function dpadMove(e){const g=$('#game').getBoundingClientRect(),dx=e.clientX-g.left-J.hx,dy=e.clientY-g.top-J.hy,ax=Math.abs(dx),ay=Math.abs(dy);
+  // the thumb can rock between arrows; a little hysteresis stops flicker on the diagonal
+  if(Math.hypot(dx,dy)<12*opt.size)return showDir(-1);const cur=touchDir;
+  const horiz=(cur===1||cur===3)?ax>ay*.8:(cur===0||cur===2)?ax>ay*1.25:ax>=ay;showDir(horiz?(dx>0?1:3):(dy>0?2:0))}
 function joyMove(e){const g=$('#game').getBoundingClientRect(),x=e.clientX-g.left,y=e.clientY-g.top,R=62*opt.size;
   let dx=x-J.cx,dy=y-J.cy,len=Math.hypot(dx,dy);
   if(opt.joy==='float'&&len>R*1.3){const k=(len-R*1.3)/len;setJoy(J.cx+dx*k,J.cy+dy*k);dx=x-J.cx;dy=y-J.cy;len=Math.hypot(dx,dy)}
@@ -604,8 +627,9 @@ function joyMove(e){const g=$('#game').getBoundingClientRect(),x=e.clientX-g.lef
     nd=horiz?(dx>0?1:3):(dy>0?2:0)}
   showDir(nd)}
 zM.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();if(J.id!==null)return;J.id=e.pointerId;try{zM.setPointerCapture(e.pointerId)}catch(_){}
+  if(opt.joy==='dpad'){dpadMove(e);return}
   const g=$('#game').getBoundingClientRect();if(opt.joy==='float')setJoy(e.clientX-g.left,e.clientY-g.top);joyEl.classList.remove('idle');joyMove(e)});
-zM.addEventListener('pointermove',e=>{if(e.pointerId===J.id)joyMove(e)});
+zM.addEventListener('pointermove',e=>{if(e.pointerId===J.id)(opt.joy==='dpad'?dpadMove:joyMove)(e)});
 function joyEnd(e){if(e&&e.pointerId!==J.id)return;J.id=null;showDir(-1);setJoy(J.hx,J.hy);knob.style.transform='translate(-50%,-50%)';joyEl.classList.add('idle')}
 zM.addEventListener('pointerup',joyEnd);zM.addEventListener('pointercancel',joyEnd);
 zF.addEventListener('pointerdown',e=>{e.preventDefault();audioInit();try{zF.setPointerCapture(e.pointerId)}catch(_){}fireIds.add(e.pointerId);touchFire=true;fireEl.classList.add('on');vib(12)});
