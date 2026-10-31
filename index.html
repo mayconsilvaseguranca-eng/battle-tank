@@ -193,6 +193,7 @@ html.coarse #feed div{font-size:15px;padding:2px 6px}
         <button class="mode" id="mTeam"><canvas width="96" height="40" data-art="team" aria-hidden="true"></canvas><b>EQUIPE</b><span>Amarelo x Azul</span></button>
       </div>
       <div class="foot">
+        <button class="btn small" id="bFullMenu" hidden>Tela cheia</button>
         <button class="btn small" id="bOpts">Opções de controle</button>
         <span class="keys"><kbd>↑↓←→</kbd> <kbd>WASD</kbd> move · <kbd id="kFire">ESPAÇO</kbd> atira</span>
       </div>
@@ -618,6 +619,13 @@ let rotOk=false;
 function goFull(){if(!root.classList.contains('coarse'))return;const el=root,rq=el.requestFullscreen||el.webkitRequestFullscreen;
   if(!rq||document.fullscreenElement||document.webkitFullscreenElement)return;
   try{const p=rq.call(el);const lock=()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})}catch(e){}};if(p&&p.then)p.then(lock).catch(()=>{});else lock()}catch(e){}}
+const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+const canFs=!!(root.requestFullscreen||root.webkitRequestFullscreen);
+function toggleFull(){if(fsEl()){const ex=document.exitFullscreen||document.webkitExitFullscreen;try{const p=ex&&ex.call(document);if(p&&p.catch)p.catch(()=>{})}catch(e){}return}
+  const rq=root.requestFullscreen||root.webkitRequestFullscreen;if(!rq)return;
+  try{const p=rq.call(root);const lock=()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock('landscape').catch(()=>{})}catch(e){}};if(p&&p.then)p.then(lock).catch(()=>{});else lock()}catch(e){}}
+function syncFullBtn(){const b=$('#bFullMenu');b.hidden=!canFs;b.textContent=fsEl()?'Sair da tela cheia':'Tela cheia'}
+document.addEventListener('fullscreenchange',syncFullBtn);document.addEventListener('webkitfullscreenchange',syncFullBtn);
 function checkRotate(){$('#rotate').hidden=!(curScreen==='game'&&root.classList.contains('coarse')&&innerHeight>innerWidth&&!rotOk)}
 $('#bRotOk').onclick=()=>{rotOk=true;checkRotate()};
 
@@ -808,6 +816,7 @@ $('#bJoin').onclick=()=>{goFull();joinGame($('#code').value)};
 $('#bOpts').onclick=openOpts;
 $('#mFfa').onclick=()=>openMode('ffa');$('#mTeam').onclick=()=>openMode('team');$('#bBack').onclick=()=>show('menu');$('#bOpts2').onclick=openOpts;
 $('#bFull').onclick=goFull;
+$('#bFullMenu').onclick=toggleFull;syncFullBtn();
 $('#code').addEventListener('keydown',e=>{if(e.key==='Enter')joinGame($('#code').value)});
 
 /* ---------- game screen ---------- */
