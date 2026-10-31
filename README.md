@@ -24,3 +24,13 @@ Para ter menos lag, a pessoa com a melhor internet deve criar a sala e deixar a 
 ## Publicar no GitHub Pages
 
 Settings → Pages → Source: **Deploy from a branch** → Branch: `main`, pasta `/ (root)` → Save.
+
+## Versão de teste no Claude
+
+A pasta `claude-teste/` monta uma cópia do jogo para testar dentro do Claude antes de publicar aqui.
+O jogo é o mesmo `index.html`; só o bloco de conexão (entre `@net:begin` e `@net:end`) é trocado,
+porque o Claude bloqueia WebRTC e usa o sistema de salas dele.
+
+```
+python3 claude-teste/build.py teste.html
+```

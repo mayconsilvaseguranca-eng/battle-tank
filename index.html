@@ -653,12 +653,72 @@ document.addEventListener('fullscreenchange',syncFullBtn);document.addEventListe
 function checkRotate(){$('#rotate').hidden=!(curScreen==='game'&&root.classList.contains('coarse')&&innerHeight>innerWidth&&!rotOk)}
 $('#bRotOk').onclick=()=>{rotOk=true;checkRotate()};
 
-/* ---------- rede: PeerJS (WebRTC direto entre navegadores) ---------- */
-const PREFIX='battletank-mss-';
-const hasPeer=typeof Peer==='function';
-if(!hasPeer)$('#netnote').innerHTML='<span class="warn">Não deu para carregar o modo online.</span> Verifique a internet e recarregue a página. O treino solo funciona normalmente.';
+/* @net:begin — conexão do SITE (PeerJS / WebRTC). No teste do Claude este bloco é trocado por claude-teste/net-room.js */
+const NET=(()=>{
+  const PREFIX='battletank-mss-',ok=typeof Peer==='function';
+  if(!ok)$('#netnote').innerHTML='<span class="warn">Não deu para carregar o modo online.</span> Verifique a internet e recarregue a página. O treino com bots funciona normalmente.';
+  function openHost(m,cb,tries=0){const code=genCode(),p=new Peer(PREFIX+code,{debug:0});m.peer=p;m.links=new Map();
+    p.on('open',()=>{if(mode!==m){p.destroy();return}cb.ready(code)});
+    p.on('connection',conn=>{if(mode!==m){conn.close();return}
+      conn.on('open',()=>{if(mode!==m)return;m.links.set(conn.peer,conn);hostPeerJoin(m,conn.peer)});
+      conn.on('data',d=>hostPeerData(m,conn.peer,d));
+      conn.on('close',()=>{if(m.links)m.links.delete(conn.peer);hostPeerLeave(m,conn.peer)});
+      conn.on('error',()=>{})});
+    p.on('error',e=>{if(mode!==m)return;
+      if(e.type==='unavailable-id'&&tries<5){p.destroy();openHost(m,cb,tries+1);return}
+      if(!m.code){p.destroy();m.peer=null;cb.fail(e.type)}});
+    p.on('disconnected',()=>{if(mode===m&&!p.destroyed)setTimeout(()=>{try{if(!p.destroyed)p.reconnect()}catch(e){}},1000)})}
+  function sendTo(m,id,msg){const c=m.links&&m.links.get(id);if(!c)return;try{if(c.open)c.send(msg)}catch(e){}
+    if(msg.t==='full')setTimeout(()=>{try{c.close()}catch(e){}},400)}
+  function broadcast(m,msg){if(!m.links)return;for(const c of m.links.values())if(c.open)try{c.send(msg)}catch(e){}}
+  function join(m,code,h){const p=new Peer({debug:0});m.peer=p;
+    p.on('open',id=>{if(mode!==m)return;h.id(id);const conn=p.connect(PREFIX+code);m.conn=conn;
+      conn.on('data',d=>h.data(d));
+      conn.on('close',()=>h.closed(m.hostSeen?'O anfitrião saiu da sala.':'Sala não encontrada. Confira o código.'));
+      conn.on('error',()=>{})});
+    p.on('error',e=>{if(mode!==m)return;
+      if(e.type==='peer-unavailable')h.closed('Sala não encontrada. Confira o código.');
+      else if(!m.hostSeen)h.closed('Falha na conexão ('+e.type+'). Tente de novo.')})}
+  function send(m,msg){if(m.conn&&m.conn.open)try{m.conn.send(msg)}catch(e){}}
+  function close(m){if(m.links)for(const c of m.links.values())try{c.close()}catch(e){}
+    if(m.conn)try{m.conn.close()}catch(e){}if(m.peer)try{m.peer.destroy()}catch(e){}}
+  // lista de salas: o primeiro navegador a abrir o site vira o "quadro de avisos"
+  const LOBBY_ID=PREFIX+'lobby-v1';
+  const lb={peer:null,reg:false,conns:new Map(),ads:new Map(),link:null,linkAt:0,rooms:[],retryT:null,ready:false,ad:null};
+  function lbStop(){if(lb.peer)try{lb.peer.destroy()}catch(e){}lb.peer=null;lb.reg=false;lb.link=null;lb.conns.clear();lb.ads.clear()}
+  function lbRetry(){if(lb.retryT)return;lbStop();lb.retryT=setTimeout(()=>{lb.retryT=null;lbClaim()},800+Math.random()*2500)}
+  function lbClaim(){if(!ok)return;const p=new Peer(LOBBY_ID,{debug:0});lb.peer=p;lb.linkAt=performance.now();
+    p.on('open',()=>{if(lb.peer!==p)return;lb.reg=true;lb.ready=true;lbTick()});
+    p.on('connection',c=>{c.on('open',()=>{if(lb.peer!==p){c.close();return}lb.conns.set(c.peer,c);try{c.send({t:'list',rooms:lb.rooms})}catch(e){}});
+      c.on('data',d=>{if(lb.peer!==p||!d||typeof d!=='object'||d.t!=='ad')return;const a=cleanAd(d.a);if(a)lb.ads.set(c.peer,{a,at:performance.now()});else lb.ads.delete(c.peer)});
+      c.on('close',()=>{lb.conns.delete(c.peer);lb.ads.delete(c.peer)});c.on('error',()=>{})});
+    p.on('error',e=>{if(lb.peer!==p)return;if(e.type==='unavailable-id'){try{p.destroy()}catch(_){}lbGuest()}else if(!lb.reg)lbRetry()});
+    p.on('disconnected',()=>{if(lb.peer===p&&!p.destroyed)setTimeout(()=>{try{if(!p.destroyed)p.reconnect()}catch(e){}},1000)})}
+  function lbGuest(){const p=new Peer({debug:0});lb.peer=p;lb.reg=false;lb.linkAt=performance.now();
+    p.on('open',()=>{if(lb.peer!==p)return;const c=p.connect(LOBBY_ID);lb.link=c;
+      c.on('open',()=>{lb.ready=true;lbSendAd()});
+      c.on('data',d=>{if(lb.peer!==p||!d||d.t!=='list'||!Array.isArray(d.rooms))return;lb.rooms=d.rooms.slice(0,40);renderRooms()});
+      c.on('close',()=>{if(lb.peer===p)lbRetry()});c.on('error',()=>{})});
+    p.on('error',()=>{if(lb.peer===p)lbRetry()})}
+  function lbSendAd(){if(lb.link&&lb.link.open)try{lb.link.send({t:'ad',a:lb.ad})}catch(e){}}
+  function lbTick(){const now=performance.now(),rooms=[];
+    for(const [k,v] of lb.ads){if(now-v.at>8000)lb.ads.delete(k);else rooms.push(v.a)}
+    if(lb.ad)rooms.push(lb.ad);lb.rooms=rooms;
+    for(const c of lb.conns.values())if(c.open)try{c.send({t:'list',rooms})}catch(e){}
+    renderRooms()}
+  function lobbyTick(ad){lb.ad=ad;if(!ok)return;if(lb.reg)lbTick();else{lbSendAd();if(!(lb.link&&lb.link.open)&&!lb.retryT&&performance.now()-lb.linkAt>12000)lbRetry()}}
+  setTimeout(lbClaim,0);
+  return{ok,settled:true,openHost,sendTo,broadcast,join,send,close,lobbyTick,lobbyRooms:()=>lb.rooms,lobbyReady:()=>lb.ready,
+    inviteUrl:code=>location.origin+location.pathname+'?sala='+code.toUpperCase()};
+})();
+/* @net:end */
+
+/* ---------- rede: partes comuns (iguais no site e no teste do Claude) ---------- */
 const cleanName=n=>String(n||'').replace(/[^\p{L}\p{N} _-]/gu,'').toUpperCase().slice(0,12)||'JOGADOR';
 function genCode(){return Array.from({length:4},()=>'abcdefghjkmnpqrstuvwxyz'[(Math.random()*23)|0]).join('')}
+function cleanAd(a){if(!a||typeof a!=='object')return null;const c=String(a.c||'').toLowerCase();if(!/^[a-z]{4}$/.test(c))return null;
+  return{c,m:a.m==='team'?'team':'ffa',h:cleanName(a.h),n:Math.max(0,Math.min(MAXP,a.n|0)),ph:a.ph==='play'?'play':a.ph==='over'?'over':'lobby'}}
+function myAd(){return mode&&mode.host&&mode.code?{c:mode.code,m:mode.S.cfg.mode,h:myName(),n:mode.S.tanks.length,ph:mode.S.phase}:null}
 
 /* ---------- host ---------- */
 function hostSyncPlayers(){const S=mode.S,humans=mode.conns||new Map();
@@ -685,28 +745,23 @@ function hostSwitchTeam(owner,tm){const S=mode.S;if(!isTeam(S)||S.phase==='play'
   const t=S.tanks.find(x=>x.owner===owner);if(!t||t.team===tm)return;
   if(S.tanks.filter(x=>!x.bot&&x.team===tm).length>=TEAMMAX)return;
   setTeam(t,tm);hostSyncBots();if(curScreen==='room')renderRoom()}
+function hostPeerJoin(m,id){if(mode!==m||m.conns.has(id))return;
+  if(m.conns.size>=MAXP-1){NET.sendTo(m,id,{t:'full'});return}
+  m.conns.set(id,{name:'JOGADOR',in:0,tw:-1});hostSyncPlayers()}
+function hostPeerData(m,id,d){const c=mode===m&&m.conns.get(id);if(!c||!d||typeof d!=='object'||d.t!=='i')return;
+  c.in=d.in|0;m.S.inputs.set(id,c.in);const nm=cleanName(d.nm);if(nm!==c.name){c.name=nm;hostSyncPlayers()}
+  if(typeof d.tw==='number'&&d.tw!==c.tw){c.tw=d.tw;hostSwitchTeam(id,d.tw)}}
+function hostPeerLeave(m,id){if(mode===m&&m.conns.delete(id)){m.S.inputs.delete(id);hostSyncPlayers()}}
 function createGame(online){audioInit();leaveGame(true);
-  const S=newSim(Object.assign({},cfgs[selMode]));mode={host:true,S,peer:null,code:null,conns:new Map(),online};
+  const S=newSim(Object.assign({},cfgs[selMode]));const m={host:true,S,code:null,conns:new Map(),online};mode=m;
   addTank(S,{owner:'@host',name:myName(),team:0});S.tanks[0].alive=false;hostSyncBots();
   G.lastEid=0;G.fx.length=0;$('#roomNote').textContent='';
   show('room');renderRoom();
-  if(online){if(!hasPeer){$('#roomNote').innerHTML='<span class="warn">Modo online indisponível. Jogando offline.</span>';return}openHostPeer(S,0)}}
-function openHostPeer(S,tries){const code=genCode(),p=new Peer(PREFIX+code,{debug:0});const m=mode;m.peer=p;
-  p.on('open',()=>{if(mode!==m){p.destroy();return}m.code=code;renderRoom()});
-  p.on('connection',conn=>{if(mode!==m){conn.close();return}
-    conn.on('open',()=>{if(mode!==m)return;if(m.conns.size>=MAXP-1){try{conn.send({t:'full'})}catch(e){}setTimeout(()=>conn.close(),400);return}
-      m.conns.set(conn.peer,{conn,name:'JOGADOR',in:0});hostSyncPlayers()});
-    conn.on('data',d=>{const c=mode===m&&m.conns.get(conn.peer);if(!c||!d||typeof d!=='object')return;
-      if(d.t==='i'){c.in=d.in|0;S.inputs.set(conn.peer,c.in);const nm=cleanName(d.nm);if(nm!==c.name){c.name=nm;hostSyncPlayers()}
-        if(typeof d.tw==='number'&&d.tw!==c.tw){c.tw=d.tw;hostSwitchTeam(conn.peer,d.tw)}}});
-    conn.on('close',()=>{if(mode===m&&m.conns.delete(conn.peer)){S.inputs.delete(conn.peer);hostSyncPlayers()}});
-    conn.on('error',()=>{})});
-  p.on('error',e=>{if(mode!==m)return;
-    if(e.type==='unavailable-id'&&tries<5){p.destroy();openHostPeer(S,tries+1);return}
-    if(!m.code){p.destroy();m.peer=null;$('#roomNote').innerHTML='';const s=document.createElement('span');s.className='warn';s.textContent='Não foi possível abrir a sala online ('+e.type+'). Jogando offline.';$('#roomNote').append(s);renderRoom()}});
-  p.on('disconnected',()=>{if(mode===m&&!p.destroyed)setTimeout(()=>{try{if(!p.destroyed)p.reconnect()}catch(e){}},1000)})}
-setInterval(()=>{if(!mode||!mode.host||!mode.conns.size)return;const msg={t:'s',st:snap(mode.S)};
-  for(const c of mode.conns.values())if(c.conn.open)try{c.conn.send(msg)}catch(e){}},50);
+  if(!online)return;
+  if(!NET.ok){m.online=false;$('#roomNote').innerHTML='<span class="warn">Modo online indisponível. Jogando offline.</span>';renderRoom();return}
+  NET.openHost(m,{ready(code){if(mode!==m)return;m.code=code;renderRoom()},
+    fail(why){if(mode!==m)return;m.online=false;$('#roomNote').innerHTML='';const s=document.createElement('span');s.className='warn';s.textContent='Não foi possível abrir a sala online ('+why+'). Jogando offline.';$('#roomNote').append(s);renderRoom()}})}
+setInterval(()=>{if(mode&&mode.host&&mode.code)NET.broadcast(mode,{t:'s',st:snap(mode.S)})},50);
 let hostLast=performance.now();
 setInterval(()=>{const now=performance.now();let dt=(now-hostLast)/1000;hostLast=now;if(!mode||!mode.host)return;
   dt=Math.min(dt,.25);mode.S.localIn=curScreen==='game'?localInput():0;
@@ -715,21 +770,16 @@ setInterval(()=>{const now=performance.now();let dt=(now-hostLast)/1000;hostLast
 /* ---------- client ---------- */
 function joinGame(code){code=String(code||'').toLowerCase().replace(/[^a-z]/g,'');
   if(code.length!==4){toastNote('O código tem 4 letras.');return}
-  if(!hasPeer){toastNote('Modo online indisponível. Recarregue a página.');return}
+  if(!NET.ok){toastNote('Modo online indisponível agora.');return}
   audioInit();leaveGame(true);
-  const m={host:false,peer:null,conn:null,code,st:null,myPeer:null,hostSeen:0,joinedAt:performance.now(),sentIn:-1,sentAt:0};mode=m;
+  const m={host:false,code,st:null,myPeer:null,hostSeen:0,joinedAt:performance.now(),sentIn:-1,sentAt:0};mode=m;
   G.lastEid=-1;G.fx.length=0;G.disp.clear();G.view=null;
   show('room');renderRoom();
-  const p=new Peer({debug:0});m.peer=p;
-  p.on('open',id=>{if(mode!==m)return;m.myPeer=id;const conn=p.connect(PREFIX+code);m.conn=conn;
-    conn.on('data',d=>{if(mode!==m||!d||typeof d!=='object')return;
+  NET.join(m,code,{id(i){m.myPeer=i},
+    data(d){if(mode!==m||!d||typeof d!=='object')return;
       if(d.t==='full'){hostGone('A sala está cheia (10 tanques).');return}
-      if(d.t==='s'&&d.st&&typeof d.st==='object'){m.hostSeen=performance.now();m.st=d.st;onState()}});
-    conn.on('close',()=>{if(mode===m)hostGone(m.hostSeen?'O anfitrião saiu da sala.':'Sala não encontrada. Confira o código.')});
-    conn.on('error',()=>{})});
-  p.on('error',e=>{if(mode!==m)return;
-    if(e.type==='peer-unavailable')hostGone('Sala não encontrada. Confira o código.');
-    else if(!m.hostSeen)hostGone('Falha na conexão ('+e.type+'). Tente de novo.')})}
+      if(d.t==='s'&&d.st&&typeof d.st==='object'){m.hostSeen=performance.now();m.st=d.st;onState()}},
+    closed(msg){if(mode===m)hostGone(msg)}})}
 function onState(){let v;try{v=fromSnap(mode.st)}catch(e){return}
   G.view=v;G.recvAt=performance.now();if(selMode!==v.md){selMode=v.md}
   if(G.lastEid<0){G.lastEid=v.E.reduce((m,e)=>Math.max(m,e[0]|0),0)}
@@ -737,50 +787,19 @@ function onState(){let v;try{v=fromSnap(mode.st)}catch(e){return}
   if(curScreen==='room')renderRoom()}
 setInterval(()=>{if(!mode||mode.host)return;
   const now=performance.now(),inp=curScreen==='game'?localInput():0;
-  if(mode.conn&&mode.conn.open&&(inp!==mode.sentIn||now-mode.sentAt>60)){mode.sentIn=inp;mode.sentAt=now;try{mode.conn.send({t:'i',in:inp,nm:myName(),tw:mode.wantTeam==null?-1:mode.wantTeam})}catch(e){}}
+  if(inp!==mode.sentIn||now-mode.sentAt>60){mode.sentIn=inp;mode.sentAt=now;NET.send(mode,{t:'i',in:inp,nm:myName(),tw:mode.wantTeam==null?-1:mode.wantTeam})}
   if(mode.hostSeen&&now-mode.hostSeen>5000)hostGone('O anfitrião saiu ou a conexão caiu.');
   else if(!mode.hostSeen&&now-mode.joinedAt>15000)hostGone('Não foi possível conectar. Confira o código ou tente outra rede.')},16);
 function hostGone(msg){leaveGame();toastNote(msg)}
-
-function leaveGame(silent){if(mode){
-    if(mode.host&&mode.conns)for(const c of mode.conns.values())try{c.conn.close()}catch(e){}
-    if(mode.conn)try{mode.conn.close()}catch(e){}
-    if(mode.peer)try{mode.peer.destroy()}catch(e){}}
+function leaveGame(silent){if(mode)NET.close(mode);
   mode=null;G.view=null;G.disp.clear();$('#over').hidden=true;$('#feed').textContent='';if(!silent)openMode(selMode)}
 function toastNote(msg){$('#netnote').innerHTML='';const s=document.createElement('span');s.className='warn';s.textContent=msg;$('#netnote').append(s)}
 
-/* ---------- lista de salas: o primeiro navegador a abrir o site vira o "quadro de avisos" ---------- */
-const LOBBY_ID=PREFIX+'lobby-v1';
-const lobby={peer:null,reg:false,conns:new Map(),ads:new Map(),link:null,linkAt:0,rooms:[],retryT:null,ready:false};
-function cleanAd(a){if(!a||typeof a!=='object')return null;const c=String(a.c||'').toLowerCase();if(!/^[a-z]{4}$/.test(c))return null;
-  return{c,m:a.m==='team'?'team':'ffa',h:cleanName(a.h),n:Math.max(0,Math.min(MAXP,a.n|0)),ph:a.ph==='play'?'play':a.ph==='over'?'over':'lobby'}}
-function myAd(){return mode&&mode.host&&mode.code?{c:mode.code,m:mode.S.cfg.mode,h:myName(),n:mode.S.tanks.length,ph:mode.S.phase}:null}
-function lobbyStop(){if(lobby.peer)try{lobby.peer.destroy()}catch(e){}lobby.peer=null;lobby.reg=false;lobby.link=null;lobby.conns.clear();lobby.ads.clear()}
-function lobbyRetry(){if(lobby.retryT)return;lobbyStop();lobby.retryT=setTimeout(()=>{lobby.retryT=null;lobbyClaim()},800+Math.random()*2500)}
-function lobbyClaim(){if(!hasPeer)return;const p=new Peer(LOBBY_ID,{debug:0});lobby.peer=p;lobby.linkAt=performance.now();
-  p.on('open',()=>{if(lobby.peer!==p)return;lobby.reg=true;lobby.ready=true;lobbyTick()});
-  p.on('connection',c=>{c.on('open',()=>{if(lobby.peer!==p){c.close();return}lobby.conns.set(c.peer,c);try{c.send({t:'list',rooms:lobby.rooms})}catch(e){}});
-    c.on('data',d=>{if(lobby.peer!==p||!d||typeof d!=='object'||d.t!=='ad')return;const a=cleanAd(d.a);if(a)lobby.ads.set(c.peer,{a,at:performance.now()});else lobby.ads.delete(c.peer)});
-    c.on('close',()=>{lobby.conns.delete(c.peer);lobby.ads.delete(c.peer)});c.on('error',()=>{})});
-  p.on('error',e=>{if(lobby.peer!==p)return;if(e.type==='unavailable-id'){try{p.destroy()}catch(_){}lobbyGuest()}else if(!lobby.reg)lobbyRetry()});
-  p.on('disconnected',()=>{if(lobby.peer===p&&!p.destroyed)setTimeout(()=>{try{if(!p.destroyed)p.reconnect()}catch(e){}},1000)})}
-function lobbyGuest(){const p=new Peer({debug:0});lobby.peer=p;lobby.reg=false;lobby.linkAt=performance.now();
-  p.on('open',()=>{if(lobby.peer!==p)return;const c=p.connect(LOBBY_ID);lobby.link=c;
-    c.on('open',()=>{lobby.ready=true;lobbySendAd()});
-    c.on('data',d=>{if(lobby.peer!==p||!d||d.t!=='list'||!Array.isArray(d.rooms))return;lobby.rooms=d.rooms.slice(0,40).map(cleanAd).filter(Boolean);renderRooms()});
-    c.on('close',()=>{if(lobby.peer===p)lobbyRetry()});c.on('error',()=>{})});
-  p.on('error',()=>{if(lobby.peer===p)lobbyRetry()})}
-function lobbySendAd(){if(lobby.link&&lobby.link.open)try{lobby.link.send({t:'ad',a:myAd()})}catch(e){}}
-function lobbyTick(){const now=performance.now(),rooms=[];
-  for(const [k,v] of lobby.ads){if(now-v.at>8000)lobby.ads.delete(k);else rooms.push(v.a)}
-  const mine=myAd();if(mine)rooms.push(mine);lobby.rooms=rooms;
-  for(const c of lobby.conns.values())if(c.open)try{c.send({t:'list',rooms})}catch(e){}
-  renderRooms()}
-setInterval(()=>{if(!hasPeer)return;if(lobby.reg)lobbyTick();else{lobbySendAd();if(!(lobby.link&&lobby.link.open)&&!lobby.retryT&&performance.now()-lobby.linkAt>12000)lobbyRetry()}},2000);
+/* ---------- lista de salas ---------- */
 let roomsKey='';
 function renderRooms(){const el=$('#rooms');
-  const list=lobby.rooms.filter(r=>r.m===selMode&&!(mode&&r.c===mode.code));
-  const state=!hasPeer?'off':(!lobby.ready&&!list.length)?'wait':list.length?'list':'none';
+  const list=NET.lobbyRooms().map(cleanAd).filter(r=>r&&r.m===selMode&&!(mode&&r.c===mode.code));
+  const state=!NET.ok&&NET.settled?'off':(!NET.lobbyReady()&&!list.length)?'wait':list.length?'list':'none';
   const key=state+JSON.stringify(list);if(key===roomsKey)return;roomsKey=key;el.textContent='';
   const msg=t=>{const d=document.createElement('div');d.className='empty';d.textContent=t;el.append(d)};
   if(state==='off')return msg('Sem conexão online.');
@@ -789,8 +808,8 @@ function renderRooms(){const el=$('#rooms');
   for(const h of list){const b=document.createElement('button');b.className='roomitem';
     const code=document.createElement('b');code.textContent=h.c.toUpperCase();
     const s=document.createElement('span');s.textContent='Sala de '+h.h+' · '+h.n+'/10 tanques'+(h.ph==='lobby'?' · esperando':' · em jogo');
-    b.append(code,s);b.disabled=h.n>=MAXP&&false;b.onclick=()=>{goFull();joinGame(h.c)};el.append(b)}}
-lobbyClaim();
+    b.append(code,s);b.onclick=()=>{goFull();joinGame(h.c)};el.append(b)}}
+setInterval(()=>NET.lobbyTick(myAd()),2000);
 
 /* ---------- room screen ---------- */
 function curView(){if(!mode)return null;if(mode.host)return fromSnap(snap(mode.S));return G.view}
@@ -826,10 +845,10 @@ for(const [id,key] of [['#segDiff','diff'],['#segTime','time'],['#segKills','kil
 $('#bStart').onclick=()=>{if(!mode||!mode.host)return;audioInit();goFull();startMatch(mode.S);G.fx.length=0;show('game')};
 $('#bTeam').onclick=()=>{if(!mode)return;const v=curView();if(!v)return;const me=v.tanks.find(isMineFn());if(!me)return;
   if(mode.host)hostSwitchTeam('@host',1-me.team);else{mode.wantTeam=1-me.team;mode.sentAt=0}};
-$('#bInvite').onclick=async()=>{if(!mode||!mode.code)return;const url=location.origin+location.pathname+'?sala='+mode.code.toUpperCase();
+$('#bInvite').onclick=async()=>{if(!mode||!mode.code)return;const url=NET.inviteUrl(mode.code);
   try{await navigator.clipboard.writeText(url);$('#bInvite').textContent='Copiado!'}catch(e){$('#roomNote').textContent=url}
   setTimeout(()=>{$('#bInvite').textContent='Copiar convite'},1800)};
-(()=>{const q=new URLSearchParams(location.search).get('sala');if(q&&/^[a-zA-Z]{4}$/.test(q)){$('#code').value=q.toUpperCase();if(hasPeer)setTimeout(()=>joinGame(q),300)}})();
+(()=>{const q=new URLSearchParams(location.search).get('sala');if(q&&/^[a-zA-Z]{4}$/.test(q)){$('#code').value=q.toUpperCase();if(NET.ok)setTimeout(()=>joinGame(q),300)}})();
 $('#bLeave').onclick=()=>leaveGame();
 $('#bExit').onclick=()=>leaveGame();
 $('#bMute').onclick=()=>{muted=!muted;$('#bMute').textContent='Som: '+(muted?'off':'on');store.set('muted',muted)};
