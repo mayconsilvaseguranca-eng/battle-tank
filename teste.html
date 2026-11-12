@@ -400,7 +400,7 @@ const ET={
  queen:{hp:3600,r:34,spd:75,dmg:22,gold:40,boss:1,w1:1,fly:1,name:'RAINHA ABELHA',drawAs:'bee',baseR:9,drawScale:3.6,crown:1},
  treant:{hp:5000,r:48,spd:38,dmg:26,gold:50,boss:1,w1:1,name:'GUARDIÃO DO BOSQUE'},
  ogreking:{hp:12500,r:50,spd:55,dmg:30,gold:60,boss:1,w1:1,name:'REI OGRO',drawAs:'brute',baseR:23,drawScale:2.2,crown:1},
- wyrm:{hp:27000,r:52,spd:70,dmg:34,gold:80,boss:1,w1:1,fly:1,name:'DRAGÃO ESMERALDA',drawAs:'dragon',pal:['#1f7a4a','#3fb56d','#c6f08a']},
+ wyrm:{hp:34000,r:52,spd:70,dmg:34,gold:80,boss:1,w1:1,fly:1,name:'DRAGÃO ESMERALDA',drawAs:'dragon',pal:['#1f7a4a','#3fb56d','#c6f08a']},
  totem:{hp:1,r:22,spd:0,dmg:0,gold:0},
  add:{hp:1,r:12,spd:62,dmg:6,gold:0},
  golem:{hp:1500,r:46,spd:52,dmg:20,gold:40,boss:1,name:'GOLEM ANCIÃO'},
@@ -415,7 +415,7 @@ const BOSSMECH={
  queen:{phases:[{hp:.7,m:'totems',n:3},{hp:.35,m:'totems',n:4}],timed:[{at:30,every:30,m:'swarm'}],fury:120},
  treant:{phases:[{hp:.75,m:'pillar'},{hp:.45,m:'pillar'},{hp:.15,m:'pillar'}],timed:[{at:40,every:40,m:'sprouts'}],fury:150},
  ogreking:{phases:[{hp:.66,m:'safe'},{hp:.33,m:'safe'}],timed:[{at:25,every:25,m:'boulders'},{at:50,every:50,m:'warcry'}],fury:150},
- wyrm:{phases:[{hp:.85,m:'safe'},{hp:.65,m:'pillar'},{hp:.45,m:'totems',n:4},{hp:.25,m:'adds',n:6}],timed:[{at:35,every:35,m:'rain'}],fury:180}};
+ wyrm:{phases:[{hp:.85,m:'safe'},{hp:.65,m:'pillar'},{hp:.45,m:'totems',n:4},{hp:.25,m:'adds',n:6}],timed:[{at:30,every:30,m:'rain'}],fury:150}};
 const MECH_INFO={safe:['TERREMOTO','Entre no círculo brilhante!'],totems:['ESCUDO E CARGA','Destrua os totens antes da barra encher!'],pillar:['RAIO DEVASTADOR','Esconda-se atrás de um pilar!'],adds:['CHAMADO','Mate os ajudantes antes que cheguem ao chefe!']};
 const bossFor=r=>BOSS_W[worldOf(r)][tierOf(r)],miniFor=r=>(MINI_W[worldOf(r)]||MINI_W[0])[tierOf(r)];
 const POOLS=[
@@ -425,9 +425,9 @@ const POOLS=[
  [['imp',4],['magma',4],['bomber',2],['mage',2],['brute',2]],
  [['knight',3],['eye',3],['ghost',3],['archer',2],['mage',2],['wolf',2]]];
 const CLS={
- warrior:{n:'Guerreiro',d:'Corpo a corpo. Golpes largos atravessam inimigos e cortam projéteis.',hp:155,spd:220,dmg:13,as:1.4,rate:.71,kind:'slash',range:215,dash:1,stats:[5,4,1]},
+ warrior:{n:'Guerreiro',d:'Corpo a corpo. Golpes largos atravessam inimigos e cortam projéteis.',hp:178,spd:220,dmg:14.3,as:1.4,rate:.71,kind:'slash',moveAtk:true,range:215,dash:1,stats:[5,4,1]},
  archer:{n:'Arqueira',d:'Flechas rápidas de longe. Ótima com tiro múltiplo e ricochete.',hp:105,spd:235,dmg:18,as:1,rate:1,kind:'arrow',range:1e9,dash:1.2,stats:[3,3,5]},
- mage:{n:'Mago',d:'Bolas de fogo que explodem em área. Mais lento, devastador em grupos.',hp:100,spd:215,dmg:24,as:.8,rate:1.25,kind:'fire',range:1e9,dash:1.2,stats:[2,5,4]}};
+ mage:{n:'Mago',d:'Bolas de fogo que explodem em área. Mais lento, devastador em grupos.',hp:105,spd:215,dmg:19.3,as:.8,rate:1.25,kind:'fire',range:1e9,dash:1.2,stats:[2,5,4]}};
 const FREE_HEROES=['warrior','archer','mage'];
 const RAR=['COMUM','RARA','ÉPICA','LENDÁRIA'];
 const PW={archer:['flecha','flechas','Flecha','Flechas'],warrior:['golpe','golpes','Golpe','Golpes'],mage:['bola de fogo','bolas de fogo','Bola de Fogo','Bolas de Fogo']};
@@ -962,7 +962,7 @@ function drawDoor(){
  for(const s of[-1,1]){const tx=x+s*(DOOR_W+60),ty=60;rr(tx-5,ty,10,22,3,'#6e4420');const fl=Math.sin(time*18+s)*2;ctx.save();ctx.shadowColor=biome===4?'#62e0a0':'#ffb347';ctx.shadowBlur=18;ell(tx,ty-8+fl*.3,8,13+fl,biome===4?'#62e0a0':'#ff8a1f',false);ell(tx,ty-4,4.5,8,'#ffe14a',false);ctx.restore()}}
 
 /* ================= SETUP ================= */
-function newPlayer(cls){const c=CLS[cls];P={cls,x:RW/2,y:RH-150,r:16,hp:c.hp+M.hp*10,maxHp:c.hp+M.hp*10,spd:c.spd,dmg:c.dmg*(1+.08*M.str),rate:c.rate,pspd:600,multi:1,back:0,pierce:0,bounce:0,crit:.05,dashCd:c.dash,dashT:0,dashing:0,dvx:0,dvy:0,inv:0,regen:0,regAcc:0,vamp:0,orbit:0,orbA:0,fire:0,ice:0,shieldMax:0,shield:0,magnet:85,goldMul:1+.1*M.luck,splash:CLS[cls].kind==='bomb'?85:70,reach:1,thorns:0,armor:0,phoenix:0,phoenixUsed:0,storm:0,stormT:2.5,clone:0,berserk:0,midas:0,aura:0,auraT:0,slowT:0,dodge:0,invPots:0,psize:1,atkB:0,dmgB:0,mainB:0,asB:0,luck:1,steady:0,combo:0,comboT:0,woundT:0,frenzyT:0,corT:1,sprA:0,sprT:{},sbeamT:3,beamT:4,metT:3,orbB:0,burstQ:[],face:1,anim:0,moving:false,fireT:.4,atk:0,hurtT:0,cheerT:0,taken:{}}}
+function newPlayer(cls){const c=CLS[cls];P={cls,x:RW/2,y:RH-150,r:16,hp:c.hp+M.hp*10,maxHp:c.hp+M.hp*10,spd:c.spd,dmg:c.dmg*(1+.08*M.str),rate:c.rate,pspd:600,multi:1,back:0,pierce:0,bounce:0,crit:.05,dashCd:c.dash,dashT:0,dashing:0,dvx:0,dvy:0,inv:0,regen:0,regAcc:0,vamp:0,orbit:0,orbA:0,fire:0,ice:0,shieldMax:0,shield:0,magnet:85,goldMul:1+.1*M.luck,splash:CLS[cls].kind==='bomb'?85:62,reach:1,thorns:0,armor:0,phoenix:0,phoenixUsed:0,storm:0,stormT:2.5,clone:0,berserk:0,midas:0,aura:0,auraT:0,slowT:0,dodge:0,invPots:0,psize:1,atkB:0,dmgB:0,mainB:0,asB:0,luck:1,steady:0,combo:0,comboT:0,woundT:0,frenzyT:0,corT:1,sprA:0,sprT:{},sbeamT:3,beamT:4,metT:3,orbB:0,burstQ:[],face:1,anim:0,moving:false,fireT:.4,atk:0,hurtT:0,cheerT:0,taken:{}}}
 const PKEYS=['cls','hp','maxHp','spd','dmg','rate','multi','back','pierce','bounce','crit','dashCd','regen','vamp','orbit','fire','ice','shieldMax','magnet','goldMul','splash','reach','thorns','armor','phoenix','phoenixUsed','storm','clone','berserk','midas','aura','dodge','invPots','psize','r','atkB','dmgB','mainB','asB','luck','taken'];
 function snapRun(){const p={};for(const k of PKEYS)p[k]=P[k];return{room:run.room,cls:run.cls,lvl:run.lvl||1,xp:run.xp||0,lvQ:run.lvQ||0,gold:run.gold,gems:run.gems||0,kills:run.kills,bosses:run.bosses,seed:run.seed,pending:run.pending||0,P:p}}
 function findSpot(r,minP){for(let i=0;i<50;i++){const x=rand(B.l+r+10,B.r-r-10),y=rand(B.t+r+40,B.b-r-10);if(Math.hypot(x-P.x,y-P.y)<minP)continue;let ok=true;for(const o of obs)if(Math.hypot(x-o.x,y-o.y)<o.r+r+14){ok=false;break}if(ok)return{x,y}}return{x:rand(B.l+50,B.r-50),y:rand(B.t+60,B.t+300)}}
@@ -1177,7 +1177,7 @@ function gainXP(v){run.xp+=v;let need=xpNeed(run.lvl);while(run.xp>=need){run.xp
 const xpNeed=l=>Math.round(2+l*1.6+l*l*.012);
 function explodeFire(b,direct,full){
  const R=P.splash;rings.push({x:b.x,y:b.y,r:8,max:R,t:.3,col:'#ffb347'});burst(b.x,b.y-10,['#ff7a2e','#ffd23f','#fff'],12,220);
- for(const e of enemies){if(!targetable(e)||e===direct)continue;if(Math.hypot(e.x-b.x,e.y-b.y)<R+e.r*.6){hurtEnemy(e,b.dmg*(full?1:.7),b.crit);applyElem(e,.5)}}
+ for(const e of enemies){if(!targetable(e)||e===direct)continue;if(Math.hypot(e.x-b.x,e.y-b.y)<R+e.r*.6){hurtEnemy(e,b.dmg*(full?1:.5),b.crit);applyElem(e,.5)}}
 }
 function update(dt){
  time+=dt;
@@ -1366,8 +1366,8 @@ function updEnemy(e,dt){
   else if(e.st==='stun'){if(e.timer<=0){e.st='walk';e.timer=rand(1.2,2)}}
   break;
  case 'wolf':case 'penguin':{const pg=e.t==='penguin';
-  if(e.st==='walk'){e.x+=ux*sp*dt;e.y+=uy*sp*dt;if(d<(pg?360:280)&&e.timer<=0){e.st='crouch';e.timer=pg?.4:.45}}
-  else if(e.st==='crouch'){e.aimA=Math.atan2(dy,dx);if(e.timer<=0){e.st='lunge';e.timer=pg?.75:.38}}
+  if(e.st==='walk'){e.x+=ux*sp*dt;e.y+=uy*sp*dt;if(d<(pg?360:280)&&e.timer<=0){e.st='crouch';e.timer=pg?.4:e.mini?.85:.45}}
+  else if(e.st==='crouch'){if(!e.mini||e.timer>.35)e.aimA=Math.atan2(dy,dx);if(e.timer<=0){e.st='lunge';e.timer=pg?.75:.38}}
   else if(e.st==='lunge'){const v=pg?470:540;e.x+=Math.cos(e.aimA)*v*dt;e.y+=Math.sin(e.aimA)*v*dt;if(pg&&Math.random()<.5)parts.push({x:e.x,y:e.y,vx:0,vy:-10,life:.4,max:.4,col:'rgba(220,240,255,.8)',s:rand(3,6),g:0});if(pushOut(e)||e.timer<=0){e.st='walk';e.timer=rand(1,1.8)}}
   break}
  case 'bee':{e.wob+=dt*9;const w=Math.sin(e.wob)*.6;e.x+=(ux-uy*w)*sp*dt;e.y+=(uy+ux*w)*sp*dt;break}
@@ -1465,7 +1465,7 @@ function updEnemy(e,dt){
   e.x=clamp(e.x,B.l+e.r,B.r-e.r);e.y=clamp(e.y,B.t+e.r*.5,B.b-e.r*.3);
   break;
  }
- if(e.mini){e.eT-=dt;if(e.eT<=0){e.eT=enr?2.6:3.6;ringShot(e,(enr?10:8)+tierOf(run.room)*2,150,Math.random(),['#ff4d5e','#9be15d','#9fe3ff','#ff8a1f','#c77dff'][worldOf(run.room)]);rings.push({x:e.x,y:e.y,r:e.r,max:e.r+60,t:.3,col:'#fff'});sfx.eshoot();e.sumN=(e.sumN||0)+1;if(e.sumN%2===0&&enemies.length<9&&(tierOf(run.room)>0||enr))for(let k=0;k<2;k++){const s2=findSpot(ET[e.t].r,150);spawnEnemy(e.t,s2.x,s2.y,false,{small:true})}}}
+ if(e.mini){e.eT-=dt;if(e.eT<=0){e.eT=enr?2.6:3.6;ringShot(e,(enr?10:8)+tierOf(run.room)*2,150,Math.random(),['#ff4d5e','#9be15d','#9fe3ff','#ff8a1f','#c77dff'][worldOf(run.room)]);rings.push({x:e.x,y:e.y,r:e.r,max:e.r+60,t:.3,col:'#fff'});sfx.eshoot();e.sumN=(e.sumN||0)+1;if(e.sumN%(e.t==='wolf'?3:2)===0&&enemies.length<9&&(tierOf(run.room)>0||enr))for(let k=0;k<(e.t==='wolf'?1:2);k++){const s2=findSpot(ET[e.t].r,150);spawnEnemy(e.t,s2.x,s2.y,false,{small:true})}}}
  const charger=e.t==='brute'||e.t==='knight'||e.t==='wolf'||e.t==='penguin';
  if(!e.boss&&!charger)pushOut(e,e.fly);
  else if(charger&&e.st!=='charge'&&e.st!=='lunge')pushOut(e);
