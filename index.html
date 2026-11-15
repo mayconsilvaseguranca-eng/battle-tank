@@ -262,7 +262,7 @@ button{font-family:inherit;cursor:pointer}
     <div id="eqStats" class="eqstats"></div>
     <div id="eqDetail"></div>
     <section class="fsec"><h3 class="t" style="background:#8a5cc9">BOLSA</h3><div id="eqBag" class="eqbag"></div></section>
-    <section class="fsec"><h3 class="t" style="background:#e08a00">BAÚS</h3><div class="eqchests"><button class="btn blue" id="chest1">📦 BAÚ COMUM<small><span class="mini-gem"></span> 40</small></button><button class="btn" id="chest2" style="background:#9b4fd6">🎁 BAÚ RARO<small><span class="mini-gem"></span> 120</small></button></div><div class="fdesc" style="margin-top:0">Comum: mais itens Comum e Ótimo. Raro: sempre Ótimo ou melhor. Chefes sempre deixam um item, mini-chefes às vezes, e conquistar um mundo dá um item de raridade alta.</div></section>
+    <section class="fsec"><h3 class="t" style="background:#e08a00">BAÚS</h3><div class="eqchests"><button class="btn blue" id="chest1">📦 BAÚ COMUM<small><span class="mini-gem"></span> 40</small></button><button class="btn" id="chest2" style="background:#9b4fd6">🎁 BAÚ RARO<small><span class="mini-gem"></span> 120</small></button></div><div class="fdesc" style="margin-top:0">Fusão: 3 itens do mesmo tipo e raridade viram 1 da raridade acima, com o modelo do item escolhido. Comum: mais itens Comum e Ótimo. Raro: sempre Ótimo ou melhor. Chefes sempre deixam um item, mini-chefes às vezes, e conquistar um mundo dá um item de raridade alta.</div></section>
     <button class="btn" id="equipBack" style="align-self:center">VOLTAR</button>
   </div>
 </div>
@@ -370,7 +370,8 @@ const cv=$('c');let ctx=cv.getContext('2d');const mainCtx=ctx;
 const TAU=Math.PI*2,OUT='#2b1d14';
 const RW=900,RH=1100,B={l:58,r:RW-58,t:110,b:RH-54},DOOR_W=56;
 const PER_WORLD=50,NWORLD=5,FINAL=50,OPEN_WORLDS=3;
-const WHP=[1,1.7,3.6,7,12],WDMG=[1,1.25,1.6,3.8,5.2];
+const WRATE=[1,1.2,1.35,1.4,1.5];
+const WHP=[1,2.05,5,7,12],WDMG=[1,1.5,3.2,3.8,5.2];
 const isWorldEnd=r=>roomIn(r)===PER_WORLD;
 const rand=(a,b)=>a+Math.random()*(b-a),ri=(a,b)=>Math.floor(rand(a,b+1)),clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,k)=>a+(b-a)*k;
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -462,22 +463,22 @@ const ET={
  bandit:{hp:30,r:14,spd:72,dmg:14,gold:3},
  vulture:{hp:26,r:15,spd:85,dmg:13,gold:2,fly:1},
  cobra:{hp:34,r:15,spd:60,dmg:12,gold:3},
- scarab:{hp:6000,r:46,spd:50,dmg:24,gold:50,boss:1,name:'ESCARAVELHO REI'},
- worm:{hp:6500,r:44,spd:70,dmg:26,gold:60,boss:1,name:'VERME COLOSSAL'},
- sphinx:{hp:22000,r:50,spd:40,dmg:28,gold:70,boss:1,name:'ESFINGE DO VENTO'},
- pharaoh:{hp:60000,r:36,spd:60,dmg:30,gold:100,boss:1,fly:1,name:'FARAÓ AMALDIÇOADO'},
+ scarab:{hp:7200,r:46,spd:50,dmg:24,gold:50,boss:1,name:'ESCARAVELHO REI'},
+ worm:{hp:7800,r:44,spd:70,dmg:26,gold:60,boss:1,name:'VERME COLOSSAL'},
+ sphinx:{hp:26000,r:50,spd:40,dmg:28,gold:70,boss:1,name:'ESFINGE DO VENTO'},
+ pharaoh:{hp:72000,r:36,spd:60,dmg:30,gold:100,boss:1,fly:1,name:'FARAÓ AMALDIÇOADO'},
  clone:{hp:1,r:36,spd:60,dmg:14,gold:0,fly:1,drawAs:'pharaoh'},
  add:{hp:1,r:12,spd:62,dmg:6,gold:0},
  salam:{hp:30,r:15,spd:85,dmg:13,gold:2},
  mgolem:{hp:70,r:21,spd:42,dmg:16,gold:3,drawAs:'golem',pal:['#4a3a36','#3b2e2b','#33282a']},
  ebat:{hp:20,r:12,spd:70,dmg:12,gold:2,fly:1},
  egg:{hp:1,r:26,spd:0,dmg:0,gold:0},
- smith:{hp:1500,r:44,spd:55,dmg:22,gold:50,boss:1,name:'FERREIRO DEMÔNIO'},
- phoenix:{hp:9000,r:34,spd:80,dmg:24,gold:60,boss:1,fly:1,name:'FÊNIX'},
- titan:{hp:13000,r:52,spd:45,dmg:28,gold:70,boss:1,name:'TITÃ DE MAGMA',drawAs:'golem',pal:['#5a3a30','#4a2f27','#3f2822']},
- demonking:{hp:32000,r:40,spd:70,dmg:30,gold:80,boss:1,fly:1,name:'REI DIABO',drawAs:'imp',baseR:13,drawScale:3,crown:1},
- lavadragon:{hp:85000,r:52,spd:70,dmg:32,gold:120,boss:1,fly:1,name:'DRAGÃO DE LAVA',drawAs:'dragon'},
- golem:{hp:900,r:46,spd:52,dmg:20,gold:40,boss:1,name:'GOLEM ANCIÃO'},
+ smith:{hp:2400,r:44,spd:55,dmg:22,gold:50,boss:1,name:'FERREIRO DEMÔNIO'},
+ phoenix:{hp:15000,r:34,spd:80,dmg:24,gold:60,boss:1,fly:1,name:'FÊNIX'},
+ titan:{hp:21000,r:52,spd:45,dmg:28,gold:70,boss:1,name:'TITÃ DE MAGMA',drawAs:'golem',pal:['#5a3a30','#4a2f27','#3f2822']},
+ demonking:{hp:58000,r:40,spd:70,dmg:30,gold:80,boss:1,fly:1,name:'REI DIABO',drawAs:'imp',baseR:13,drawScale:3,crown:1},
+ lavadragon:{hp:175000,r:52,spd:70,dmg:32,gold:120,boss:1,fly:1,name:'DRAGÃO DE LAVA',drawAs:'dragon'},
+ golem:{hp:1100,r:46,spd:52,dmg:20,gold:40,boss:1,name:'GOLEM ANCIÃO'},
  frost:{hp:2700,r:50,spd:55,dmg:20,gold:50,boss:1,name:'GIGANTE DE GELO'},
  dragon:{hp:4200,r:52,spd:70,dmg:20,gold:60,boss:1,fly:1,name:'DRAGÃO DE LAVA'},
  lich:{hp:6000,r:38,spd:60,dmg:20,gold:80,boss:1,fly:1,name:'LORDE DAS SOMBRAS'}
@@ -485,7 +486,7 @@ const ET={
 const BOSS_W=[['king','queen','treant','ogreking','wyrm'],['golem','scarab','worm','sphinx','pharaoh'],['smith','phoenix','titan','demonking','lavadragon'],['frost','frost','frost','frost','frost'],['lich','lich','lich','lich','lich']];
 const MINI_W=[[['brute','OGRO CHEFE',170,1.9],['shroom','COGUMELO ANCIÃO',1200,2.1],['archer','CAPITÃO ESQUELETO',2800,2],['wolf','LOBO ALFA',5500,1.9],['bee','ZANGÃO GIGANTE',9500,3.2]],
  [['bandit','BANDIDO DO DESERTO',500,2],['scorp','RAINHA ESCORPIÃO',2600,2.3],['vulture','ABUTRE GIGANTE',6000,2.3],['cobra','COBRA RAINHA',12000,2.2],['knight','CAVALEIRO NEGRO',21000,1.9]],
- [['imp','DIABINHO CHEFE',700,2.4],['salam','SALAMANDRA RAINHA',3200,2.3],['mgolem','GOLEM DE MAGMA ANCIÃO',7500,1.6],['ebat','MORCEGO DE BRASA GIGANTE',13000,2.6],['knight','CAVALEIRO NEGRO',24000,1.9]]];
+ [['imp','DIABINHO CHEFE',1100,2.4],['salam','SALAMANDRA RAINHA',5000,2.3],['mgolem','GOLEM DE MAGMA ANCIÃO',11000,1.6],['ebat','MORCEGO DE BRASA GIGANTE',19000,2.6],['knight','CAVALEIRO NEGRO',35000,1.9]]];
 const BOSSMECH={
  king:{phases:[{hp:.7,m:'adds',n:4},{hp:.35,m:'adds',n:6}],timed:[{at:35,every:35,m:'rain'}],fury:120},
  queen:{phases:[{hp:.7,m:'totems',n:3},{hp:.35,m:'totems',n:4}],timed:[{at:30,every:30,m:'swarm'}],fury:120},
@@ -511,9 +512,9 @@ const POOLS=[
  [['penguin',4],['icee',3],['wolf',3],['brute',2],['bat',2]],
  [['knight',3],['eye',3],['ghost',3],['archer',2],['mage',2],['wolf',2]]];
 const CLS={
- warrior:{n:'Guerreiro',d:'Corpo a corpo. Golpes largos atravessam inimigos e cortam projéteis.',hp:178,spd:220,dmg:14.3,as:1.4,rate:.71,kind:'slash',moveAtk:true,range:215,dash:1,stats:[5,4,1]},
- archer:{n:'Arqueira',d:'Flechas rápidas de longe. Ótima com tiro múltiplo e ricochete.',hp:105,spd:235,dmg:18,as:1,rate:1,kind:'arrow',range:1e9,dash:1.2,stats:[3,3,5]},
- mage:{n:'Mago',d:'Bolas de fogo que explodem em área. Mais lento, devastador em grupos.',hp:105,spd:215,dmg:19.3,as:.8,rate:1.25,kind:'fire',range:1e9,dash:1.2,stats:[2,5,4]}};
+ warrior:{n:'Guerreiro',d:'Corpo a corpo. Golpes largos atravessam inimigos e cortam projéteis.',hp:170,spd:220,dmg:14.3,as:1.4,rate:.71,kind:'slash',moveAtk:true,range:215,dash:1,stats:[5,4,1]},
+ archer:{n:'Arqueira',d:'Flechas rápidas de longe. Ótima com tiro múltiplo e ricochete.',hp:118,spd:235,dmg:18,as:1,rate:1,kind:'arrow',range:1e9,dash:1.2,stats:[3,3,5]},
+ mage:{n:'Mago',d:'Bolas de fogo que explodem em área. Mais lento, devastador em grupos.',hp:122,spd:215,dmg:20.8,as:.8,rate:1.25,kind:'fire',range:1e9,dash:1.2,stats:[2,5,4]}};
 const FREE_HEROES=['warrior','archer','mage'];
 const RAR=['COMUM','RARA','ÉPICA','LENDÁRIA'];
 const PW={archer:['flecha','flechas','Flecha','Flechas'],warrior:['golpe','golpes','Golpe','Golpes'],mage:['bola de fogo','bolas de fogo','Bola de Fogo','Bolas de Fogo']};
@@ -1142,11 +1143,11 @@ function drawDoor(){
 /* ================= SETUP ================= */
 const SLOTS=[['w','Arma','🗡️'],['a','Armadura','🛡️'],['r1','Anel','💍'],['r2','Anel','💍'],['b','Bracelete','📿'],['m','Amuleto','🔮']];
 const slotType=sl=>sl==='r1'||sl==='r2'?'r':sl;
-const IRAR=['Comum','Ótimo','Raro','Épico','Lendário'],ICOL=['#8a939d','#3f9620','#2f86d6','#9b4fd6','#e08a00'],IMUL=[1,1.5,2.2,3.2,4.6];
-const IBASE={w:['dmg',.03,v=>'+'+(v*100).toFixed(1).replace('.0','')+'% de dano'],a:['hp',8,v=>'+'+Math.round(v)+' de vida'],r:['dmg',.02,v=>'+'+(v*100).toFixed(1).replace('.0','')+'% de dano'],b:['as',.02,v=>'+'+(v*100).toFixed(1).replace('.0','')+'% de velocidade de ataque'],m:['armor',.015,v=>'−'+(v*100).toFixed(1).replace('.0','')+'% de dano recebido']};
+const IRAR=['Comum','Ótimo','Raro','Épico','Lendário'],ICOL=['#8a939d','#3f9620','#2f86d6','#9b4fd6','#e08a00'],IMUL=[1,1.4,1.8,2.4,5];
+const IBASE={w:['dmg',.05,v=>'+'+(v*100).toFixed(1).replace('.0','')+'% de dano'],a:['hp',15,v=>'+'+Math.round(v)+' de vida'],r:['dmg',.03,v=>'+'+(v*100).toFixed(1).replace('.0','')+'% de dano'],b:['as',.03,v=>'+'+(v*100).toFixed(1).replace('.0','')+'% de velocidade de ataque'],m:['armor',.025,v=>'−'+(v*100).toFixed(1).replace('.0','')+'% de dano recebido']};
 const IMOD={w:[['Lâmina Valente','⚔️','bossB',[.12,.2],v=>'+'+Math.round(v*100)+'% de dano em chefes e mini-chefes'],['Lâmina Serrada','🪚','crit',[.05,.08],v=>'+'+Math.round(v*100)+'% de chance de crítico'],['Lâmina do Tornado','🌪️','as',[.08,.12],v=>'+'+Math.round(v*100)+'% de velocidade de ataque']],
  a:[['Manto da Fênix','🔥','roomHeal',[.08,.12],v=>'cura '+Math.round(v*100)+'% da vida ao entrar numa sala'],['Couraça de Ferro','🛡️','armor',[.05,.08],v=>'−'+Math.round(v*100)+'% de dano recebido'],['Veste das Sombras','🌑','dodge',[.05,.08],v=>Math.round(v*100)+'% de chance de esquivar']],
- r:[['Anel do Lobo','🐺','normB',[.1,.15],v=>'+'+Math.round(v*100)+'% de dano em inimigos comuns'],['Anel do Falcão','🦅','crit',[.04,.06],v=>'+'+Math.round(v*100)+'% de chance de crítico'],['Anel da Serpente','🐍','dodge',[.04,.06],v=>Math.round(v*100)+'% de chance de esquivar']],
+ r:[['Anel do Lobo','🐺','normB',[.1,.15],v=>'+'+Math.round(v*100)+'% de dano em inimigos comuns'],['Anel do Falcão','🦅','crit',[.04,.06],v=>'+'+Math.round(v*100)+'% de chance de crítico'],['Anel da Serpente','🐍','dodge',[.03,.05],v=>Math.round(v*100)+'% de chance de esquivar']],
  b:[['Bracelete do Trovão','⚡','thunder',[1,2],v=>'a cada 4 s, um raio de '+Math.round(v*100)+'% do ataque no inimigo mais perto'],['Bracelete da Vida','💚','vamp',[1,2],v=>'cura '+v+' de vida por inimigo derrotado'],['Bracelete da Fúria','💢','rage',[.12,.2],v=>'+'+Math.round(v*100)+'% de dano abaixo de 50% da vida']],
  m:[['Amuleto do Anjo','👼','shield',[1,2],v=>v+' escudo que bloqueia um golpe a cada onda'],['Amuleto do Sábio','📘','xp',[.08,.12],v=>'+'+Math.round(v*100)+'% de XP'],['Amuleto da Sorte','🍀','gold',[.15,.25],v=>'+'+Math.round(v*100)+'% de ouro']]};
 const itemName=it=>IMOD[it.s][it.k][0];
@@ -1156,11 +1157,11 @@ function itemDesc(it){const b=IBASE[it.s],md=IMOD[it.s][it.k];let t=b[2](itemBas
 function autoEquip(m){m=m||M;for(const sl of ['w','a','r1','r2','b','m']){if(m.eq[sl]&&m.inv.some(i=>i.id===m.eq[sl]))continue;delete m.eq[sl];const st=(sl==='r1'||sl==='r2')?'r':sl,used=new Set(Object.values(m.eq));const best=m.inv.filter(i=>i.s===st&&!used.has(i.id)).sort((a,b)=>b.r-a.r)[0];if(best)m.eq[sl]=best.id}}
 function giveItem(r,s,quiet){const it={id:M.nid++,s:s||pick(['w','a','r','r','b','m']),k:Math.floor(Math.random()*3),r};M.inv.push(it);autoEquip();{const sls=it.s==='r'?['r1','r2']:[it.s],cur=sls.map(sl=>[sl,M.inv.find(i=>i.id===M.eq[sl])]).sort((a,b)=>(a[1]?a[1].r:-1)-(b[1]?b[1].r:-1))[0];if(!Object.values(M.eq).includes(it.id)&&(!cur[1]||cur[1].r<it.r))M.eq[cur[0]]=it.id}persist();if(!quiet&&P&&run)addText(P.x,P.y-130,IMOD[it.s][it.k][1]+' '+itemName(it)+' '+IRAR[it.r]+'!',it.r===0?'#fff':ICOL[it.r],1.5);return it}
 function rollR(W){let k=Math.random()*W.reduce((a,b)=>a+b,0),r=0;for(;r<4;r++){if((k-=W[r])<0)break}return Math.min(4,r)}
-function dropItem(kind){if(kind==='mini'&&Math.random()>.35)return;const w=Math.min(2,worldOf(run.room));giveItem(rollR([[60,30,9,1,0],[35,38,20,6,1],[15,35,32,15,3]][w]))}
+function dropItem(kind){if(kind==='mini'&&Math.random()>.25)return;const w=Math.min(2,worldOf(run.room));giveItem(rollR([[60,30,9,1,0],[35,38,20,6,1],[15,35,32,15,3]][w]))}
 function eqStats(){const S={dmg:0,hp:0,as:0,armor:0,bossB:0,crit:0,dodge:0,normB:0,roomHeal:0,thunder:0,vamp:0,rage:0,shield:0,xp:0,gold:0};
  for(const [sl] of SLOTS){const id=M.eq&&M.eq[sl];const it=id&&M.inv.find(i=>i.id===id);if(!it)continue;S[IBASE[it.s][0]]+=itemBase(it);const ex=itemExtra(it);if(ex!==null)S[IMOD[it.s][it.k][2]]+=ex}return S}
-function fuseItem(it){const same=M.inv.filter(i=>i.s===it.s&&i.k===it.k&&i.r===it.r);if(it.r>=4||same.length<3)return false;const use=[it,...same.filter(i=>i!==it).slice(0,2)],ids=new Set(use.map(i=>i.id));const wasEq=Object.keys(M.eq).find(sl=>ids.has(M.eq[sl]));M.inv=M.inv.filter(i=>!ids.has(i.id));const nu={id:M.nid++,s:it.s,k:it.k,r:it.r+1};M.inv.push(nu);for(const sl in M.eq)if(ids.has(M.eq[sl]))delete M.eq[sl];if(wasEq)M.eq[wasEq]=nu.id;autoEquip();persist();return nu}
-const HPASS={warrior:[[5,'+10% de vida'],[10,'Golpe 15% maior'],[15,'−8% de dano recebido']],archer:[[5,'Atira andando (40% da velocidade)'],[10,'+10% de velocidade de ataque'],[15,'Atira andando (70% da velocidade)']],mage:[[5,'Atira andando (40% da velocidade)'],[10,'Explosão 20% maior'],[15,'Atira andando (70% da velocidade)']]};
+function fuseItem(it){const same=M.inv.filter(i=>i.s===it.s&&i.r===it.r);if(it.r>=4||same.length<3)return false;const eqv=new Set(Object.values(M.eq));const use=[it,...same.filter(i=>i!==it).sort((a,b)=>eqv.has(a.id)-eqv.has(b.id)).slice(0,2)],ids=new Set(use.map(i=>i.id));const wasEq=Object.keys(M.eq).find(sl=>ids.has(M.eq[sl]));M.inv=M.inv.filter(i=>!ids.has(i.id));const nu={id:M.nid++,s:it.s,k:it.k,r:it.r+1};M.inv.push(nu);for(const sl in M.eq)if(ids.has(M.eq[sl]))delete M.eq[sl];if(wasEq)M.eq[wasEq]=nu.id;autoEquip();persist();return nu}
+const HPASS={warrior:[[5,'+10% de vida'],[10,'Golpe 15% maior'],[15,'−8% de dano recebido']],archer:[[5,'Atira andando (55% da velocidade)'],[10,'+10% de velocidade de ataque'],[15,'Atira andando (80% da velocidade)']],mage:[[5,'Atira andando (55% da velocidade)'],[10,'Explosão 20% maior'],[15,'Atira andando (80% da velocidade)']]};
 const hxNeed=L=>15*L+5*L*(L-1);
 function heroLv(c){const xp=(M.hx&&M.hx[c])||0;let L=0;while(L<20&&xp>=hxNeed(L+1))L++;return L}
 function heroXP(n){if(!run||!P)return;M.hx=M.hx||{};const c=P.cls,b=heroLv(c);M.hx[c]=(M.hx[c]||0)+n;const a=heroLv(c);if(a>b){const ps=(HPASS[c].find(x=>x[0]===a)||[])[1];run.hlvMsg=['⭐ '+CLS[c].n.toUpperCase()+' NÍVEL '+a,ps?'Nova passiva: '+ps:'+1% de dano e vida na próxima partida']}}
@@ -1173,7 +1174,7 @@ function applyMeta(cls){const hl=heroLv(cls);
  let hp=P.maxHp+E.hp+(chDone('c3')?15:0)+(chDone('c7')?10:0);hp*=1+.01*hl;if(M.rel&&M.rel.includes('r1'))hp*=1.1;if(cls==='warrior'&&hl>=5)hp*=1.1;P.maxHp=P.hp=Math.round(hp);
  P.asB+=E.as+(chDone('c2')?.03:0)+(cls==='archer'&&hl>=10?.1:0);
  P.armor=Math.min(.6,P.armor+E.armor+(chDone('c5')?.03:0)+(cls==='warrior'&&hl>=15?.08:0));
- P.moveK=cls!=='warrior'?(hl>=15?.7:hl>=5?.4:0):0;if(cls==='mage'&&hl>=10)P.splash*=1.2;if(cls==='warrior'&&hl>=10)P.reach*=1.15;P.xpB=(chDone('c6')?.05:0)+E.xp;P.bossB=E.bossB;P.normB=E.normB;P.crit+=E.crit;P.dodge+=E.dodge;P.roomHeal=E.roomHeal;P.thunder=E.thunder;P.thT=4;P.vamp+=E.vamp;P.rage=E.rage;P.shieldMax+=E.shield;P.shield=P.shieldMax;P.goldMul*=1+E.gold}
+ P.moveK=cls!=='warrior'?(hl>=15?.8:hl>=5?.55:0):0;if(cls==='mage'&&hl>=10)P.splash*=1.2;if(cls==='warrior'&&hl>=10)P.reach*=1.15;P.xpB=(chDone('c6')?.05:0)+E.xp;P.bossB=E.bossB;P.normB=E.normB;P.crit+=E.crit;P.dodge+=E.dodge;P.roomHeal=E.roomHeal;P.thunder=E.thunder;P.thT=4;P.vamp+=E.vamp;P.rage=E.rage;P.shieldMax+=E.shield;P.shield=P.shieldMax;P.goldMul*=1+E.gold}
 function newPlayer(cls){const c=CLS[cls];P={cls,x:RW/2,y:RH-150,r:16,hp:c.hp+M.hp*10,maxHp:c.hp+M.hp*10,armor:.03*M.arm,spd:c.spd,dmg:c.dmg*(1+.08*M.str),rate:c.rate,pspd:600,multi:1,back:0,pierce:0,bounce:0,crit:.05,dashCd:c.dash,dashT:0,dashing:0,dvx:0,dvy:0,inv:0,regen:0,regAcc:0,vamp:0,orbit:0,orbA:0,fire:0,ice:0,shieldMax:0,shield:0,magnet:85,goldMul:1,splash:CLS[cls].kind==='bomb'?85:62,reach:1,thorns:0,phoenix:0,phoenixUsed:0,storm:0,stormT:2.5,clone:0,berserk:0,midas:0,aura:0,auraT:0,slowT:0,dodge:0,invPots:M.pot,psize:1,atkB:0,dmgB:0,mainB:0,asB:.04*M.agi,luck:1,steady:0,combo:0,comboT:0,woundT:0,frenzyT:0,corT:1,sprA:0,sprT:{},sbeamT:3,beamT:4,metT:3,orbB:0,burstQ:[],face:1,anim:0,moving:false,fireT:.4,atk:0,hurtT:0,cheerT:0,taken:{}};applyMeta(cls)}
 const PKEYS=['bossB','normB','roomHeal','thunder','rage','moveK','xpB','cls','hp','maxHp','spd','dmg','rate','multi','back','pierce','bounce','crit','dashCd','regen','vamp','orbit','fire','ice','shieldMax','magnet','goldMul','splash','reach','thorns','armor','phoenix','phoenixUsed','storm','clone','berserk','midas','aura','secondUsed','dodge','invPots','psize','r','atkB','dmgB','mainB','asB','luck','taken'];
 function snapRun(){const p={};for(const k of PKEYS)p[k]=P[k];return{room:run.room,cls:run.cls,lvl:run.lvl||1,xp:run.xp||0,lvQ:run.lvQ||0,gold:run.gold,gems:run.gems||0,kills:run.kills,bosses:run.bosses,seed:run.seed,pending:run.pending||0,P:p}}
@@ -1617,7 +1618,7 @@ function updEnemy(e,dt){
  const sl=e.slow>0?.6:1;e.slow=Math.max(0,e.slow-dt);
  const dx=P.x-e.x,dy=P.y-e.y,d=Math.hypot(dx,dy)||1,ux=dx/d,uy=dy/d,sp=e.spd*sl;
  if(e.st!=='charge'&&e.st!=='lunge')e.face=dx>0?1:-1;
- e.timer-=dt*(e.fury?1.4:1);
+ e.timer-=dt*(e.fury?1.4:1)*WRATE[worldOf(run.room)];
  const enr=e.hp<e.maxHp*.5,keep=(lo,hi)=>d>hi?1:d<lo?-1:0;
  switch(e.t){
  case 'slime':case 'magma':
@@ -2006,7 +2007,7 @@ function renderEquip(){$('eqGems').textContent=M.gems;const slots=$('eqSlots');s
  for(const k of['bossB','crit','dodge','normB','roomHeal','thunder','vamp','rage','shield','xp','gold'])if(E[k]){for(const t in IMOD)for(const md of IMOD[t])if(md[2]===k){L.push('✨ '+md[4](E[k]));break}}
  $('eqStats').innerHTML='<span class="t" style="font-size:15px;color:#ffd84a">BÔNUS DOS ITENS</span><br>'+(L.length?[...new Set(L)].join('<br>'):'Nenhum item equipado');
  const det=$('eqDetail');det.innerHTML='';const sel=eqSel&&byId(eqSel);
- if(sel){const eqAt=Object.keys(M.eq).find(k=>M.eq[k]===sel.id),same=M.inv.filter(i=>i.s===sel.s&&i.k===sel.k&&i.r===sel.r).length,d=document.createElement('div');d.className='eqdet';d.style.borderColor=ICOL[sel.r];
+ if(sel){const eqAt=Object.keys(M.eq).find(k=>M.eq[k]===sel.id),same=M.inv.filter(i=>i.s===sel.s&&i.r===sel.r).length,d=document.createElement('div');d.className='eqdet';d.style.borderColor=ICOL[sel.r];
   d.innerHTML=(eqNew===sel.id?'<div class="tt" style="color:#e08a00">NOVO ITEM!</div>':'')+'<div class="tt">'+IMOD[sel.s][sel.k][1]+' '+itemName(sel)+' <span class="gtag" style="background:'+ICOL[sel.r]+'">'+IRAR[sel.r]+'</span></div>'+SLOTS.find(x=>slotType(x[0])===sel.s)[1]+(eqAt?' · equipado':'')+'<br>'+itemDesc(sel);
   const bt=document.createElement('div');bt.className='btns';
   const slotsFor=sel.s==='r'?['r1','r2']:[sel.s];
