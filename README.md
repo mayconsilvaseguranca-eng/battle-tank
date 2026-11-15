@@ -44,7 +44,25 @@ Liberado ao vencer o Mundo 1. Cada partida começa no nível 1, só com a força
 | 35 | Cobra Rainha | 40 | Esfinge do Vento | Tempestade fecha a arena: corrida contra o tempo |
 | 45 | Cavaleiro Negro | 50 | Faraó Amaldiçoado | Todas, mais a fase de clones (só o verdadeiro tem sombra) |
 
-Todo chefe também tem ataques que aparecem conforme a luta demora e entra em fúria se a luta passar de 2,5 a 3 minutos. Os mundos 3 a 5 estão em construção.
+Todo chefe também tem ataques que aparecem conforme a luta demora e entra em fúria se a luta passar de 2,5 a 3 minutos. ## Mundo 3: Vulcão de Lava
+
+Liberado ao vencer o Mundo 2. Salas com poucos inimigos (2 a 4), cada um com ataques avisados para aprender e esquivar.
+
+| Sala | Mini-chefe | Sala | Chefe | Mecânica principal |
+|---|---|---|---|---|
+| 5 | Diabinho Chefe | 10 | Ferreiro Demônio | Chão de brasas em xadrez |
+| 15 | Salamandra Rainha | 20 | Fênix | Ovo: quebre antes que ela renasça |
+| 25 | Golem de Magma Ancião | 30 | Titã de Magma | Rios de lava que varrem a arena |
+| 35 | Morcego de Brasa Gigante | 40 | Rei Diabo | Espiral de fogo para sobreviver |
+| 45 | Cavaleiro Negro | 50 | Dragão de Lava | Todas as quatro |
+
+## Progresso fora da Forja (menu 🎒 Progresso)
+
+- Nível de cada herói (até 20), com passivas nos níveis 5, 10 e 15.
+- Equipamentos (arma, armadura, anel, amuleto) que caem de chefes e mini-chefes; 3 iguais viram 1 de raridade acima.
+- Relíquias dos chefes finais e desafios com bônus permanentes.
+
+Os mundos 4 e 5 estão em construção.
 
 ## Habilidades
 
