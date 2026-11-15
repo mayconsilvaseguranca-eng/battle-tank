@@ -215,7 +215,6 @@ button{font-family:inherit;cursor:pointer}
 
 <div id="menu" class="ov show">
   <div class="logo"><div class="t l1">LENDAS DA</div><div class="t l2">MASMORRA</div></div>
-  <div class="t sub">5 mundos · 50 salas · 10 chefes</div>
   <button class="btn green big" id="contB" style="display:none">CONTINUAR<small id="contS"></small></button>
   <button class="btn big" id="playB">NOVA PARTIDA</button>
   <div class="row"><button class="btn blue" id="forgeB">⚒️ FORJA</button></div>
@@ -1604,7 +1603,7 @@ function renderMenu(){
  const r=save.run;$('contB').style.display=r?'block':'none';
  if(r)$('contS').textContent='Mundo '+(worldOf(r.room)+1)+' · Sala '+roomIn(r.room)+(isBossRoom(r.room)?' (chefe)':'')+' · '+CLS[r.cls].n;
  $('playB').className=r?'btn':'btn green big';
- $('menuStats').innerHTML='<span>🏆 Recorde: sala '+M.best+'/'+FINAL+'</span>'+(M.wins?'<span>🌳 Mundo 1 conquistado!</span>':'<span>🌳 Mundo 1: chefe final na sala 50</span>')+'<span>💎 Gemas: '+M.gems+'</span>'+(M.wins?'<span>👑 Vitórias: '+M.wins+'</span>':'');
+ $('menuStats').innerHTML='<span>🏆 Recorde: sala '+M.best+'/'+FINAL+'</span>'+'<span>💎 Gemas: '+M.gems+'</span>'+(M.wins?'<span>👑 Vitórias: '+M.wins+'</span>':'');
 }
 function renderCls(){
  const row=$('clsRow');row.innerHTML='';portraits.length=0;$('clsWarn').style.display=save.run?'block':'none';
