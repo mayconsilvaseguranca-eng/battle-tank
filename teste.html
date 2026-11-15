@@ -423,9 +423,9 @@ const ET={
  ogreking:{hp:12500,r:50,spd:55,dmg:30,gold:60,boss:1,w1:1,name:'REI OGRO',drawAs:'brute',baseR:23,drawScale:2.2,crown:1},
  wyrm:{hp:34000,r:52,spd:70,dmg:34,gold:80,boss:1,w1:1,fly:1,name:'DRAGÃO ESMERALDA',drawAs:'dragon',pal:['#1f7a4a','#3fb56d','#c6f08a']},
  totem:{hp:1,r:22,spd:0,dmg:0,gold:0},
- bandit:{hp:30,r:14,spd:95,dmg:14,gold:3},
- vulture:{hp:26,r:15,spd:110,dmg:13,gold:2,fly:1},
- cobra:{hp:34,r:15,spd:75,dmg:12,gold:3},
+ bandit:{hp:30,r:14,spd:72,dmg:14,gold:3},
+ vulture:{hp:26,r:15,spd:85,dmg:13,gold:2,fly:1},
+ cobra:{hp:34,r:15,spd:60,dmg:12,gold:3},
  scarab:{hp:6000,r:46,spd:50,dmg:24,gold:50,boss:1,name:'ESCARAVELHO REI'},
  worm:{hp:6500,r:44,spd:70,dmg:26,gold:60,boss:1,name:'VERME COLOSSAL'},
  sphinx:{hp:22000,r:50,spd:40,dmg:28,gold:70,boss:1,name:'ESFINGE DO VENTO'},
@@ -455,7 +455,7 @@ const MECH_INFO={pits:['O CHÃO VAI CEDER','Saia de cima das rachaduras!'],quick
 const bossFor=r=>BOSS_W[worldOf(r)][tierOf(r)],miniFor=r=>(MINI_W[worldOf(r)]||MINI_W[0])[tierOf(r)];
 const POOLS=[
  [['slime',4],['bee',3,2],['shroom',3,3],['bat',2],['archer',2,6],['bomber',2,12],['wolf',3,16],['brute',2,22],['mage',2,27],['knight',1,41]],
- [['scorp',4],['mummy',3,3],['slime',2],['bandit',2,6],['bomber',2,9],['archer',2,12],['vulture',3,16],['cobra',3,21],['brute',2,26],['mage',2,31],['knight',1,38],['ghost',2,42]],
+ [['scorp',3],['mummy',3,3],['slime',2],['bandit',2,6],['bomber',2,9],['archer',2,12],['vulture',3,16],['cobra',3,21],['brute',2,26],['mage',2,31],['knight',1,38],['ghost',2,42]],
  [['penguin',4],['icee',3],['wolf',3],['brute',2],['bat',2]],
  [['imp',4],['magma',4],['bomber',2],['mage',2],['brute',2]],
  [['knight',3],['eye',3],['ghost',3],['archer',2],['mage',2],['wolf',2]]];
@@ -951,7 +951,7 @@ function drawScarab(e){const x=e.x,y=e.y,r=e.r,fa=e.faceA!==undefined?e.faceA:0,
  for(const gx of[-.45,.45])circ(gx*r,r*.3,5,'#ffd23f');ctx.restore();
  flashOver(x,y-r*.7,r,r,e.flash)}
 function drawWorm(e){const x=e.x,y=e.y,r=e.r;
- if(e.under||e.st==='rise'){ell(x,y-6,r*1.1,r*.45,'#c9a552');ell(x,y-9,r*.6,r*.2,'rgba(255,255,255,.25)',false);if(e.st==='rise'){ctx.save();ctx.globalAlpha=.35+(1-e.timer/.75)*.4;ell(x,y,90,45,'#ff4d5e',false);ctx.restore()}return}
+ if(e.under||e.st==='rise'){ell(x,y-6,r*1.1,r*.45,'#c9a552');ell(x,y-9,r*.6,r*.2,'rgba(255,255,255,.25)',false);if(e.st==='rise'){ctx.save();ctx.globalAlpha=.35+(1-e.timer/1.05)*.4;ell(x,y,90,45,'#ff4d5e',false);ctx.restore()}return}
  setLine(4);const sw=Math.sin(e.anim*3)*6;
  ell(x,y-6,r*1.3,r*.5,'#b8913f');
  for(let i=0;i<4;i++){const sy=y-20-i*30,sx=x+Math.sin(e.anim*3+i*.8)*6;ell(sx,sy,r*(1-i*.08),r*.55,i%2?'#d9a066':'#c98b4b')}
@@ -1505,8 +1505,8 @@ function updEnemy(e,dt){
   else if(e.timer<=0){e.st='walk';e.timer=2.6}
   break;
  case 'scorp':
-  if(e.st==='aim'){if(e.timer<=0){const a=Math.atan2(dy,dx);for(let i=-1;i<=1;i++)shootE(e.x,e.y-30,a+i*.16,260,e.dmg,'#9be15d',7);sfx.eshoot();e.st='walk';e.timer=rand(1.8,2.6)}}
-  else{const want=keep(170,260);e.x+=ux*want*sp*dt;e.y+=uy*want*sp*dt;if(e.timer<=0&&d<500){e.st='aim';e.timer=.55}}
+  if(e.st==='aim'){if(e.timer<=0){const a=Math.atan2(dy,dx);for(let i=-1;i<=1;i++)shootE(e.x,e.y-30,a+i*.16,215,e.dmg,'#9be15d',7);sfx.eshoot();e.st='walk';e.timer=rand(2.3,3.1)}}
+  else{const want=keep(170,260);e.x+=ux*want*sp*dt;e.y+=uy*want*sp*dt;if(e.timer<=0&&d<500){e.st='aim';e.timer=.75}}
   break;
  case 'mummy':e.x+=ux*sp*dt;e.y+=uy*sp*dt;break;
  case 'icee':{const want=keep(200,300);e.x+=(ux*want-uy*.4)*sp*dt;e.y+=(uy*want+ux*.4)*sp*dt;
@@ -1530,31 +1530,31 @@ function updEnemy(e,dt){
   break;
  case 'totem':break;
  case 'bandit':
-  if(e.st==='flee'){e.x-=ux*sp*1.8*dt;e.y-=uy*sp*1.8*dt;if(e.timer<=0){e.st='walk';e.timer=rand(1.8,2.6)}}
-  else{const want=keep(220,300);e.x+=(ux*want-uy*.4)*sp*dt;e.y+=(uy*want+ux*.4)*sp*dt;if(e.timer<=0&&d<520){const n=e.mini?3:1;for(let i=0;i<n;i++)zone(P.x+(i?rand(-90,90):0),P.y+(i?rand(-90,90):0),e.mini?70:58,.95,e.dmg,'meteor','#ffb347');e.aimA=Math.atan2(dy,dx);e.st='flee';e.timer=.8;sfx.eshoot()}}
+  if(e.st==='flee'){e.x-=ux*sp*1.8*dt;e.y-=uy*sp*1.8*dt;if(e.timer<=0){e.st='walk';e.timer=rand(2.4,3.2)}}
+  else{const want=keep(220,300);e.x+=(ux*want-uy*.4)*sp*dt;e.y+=(uy*want+ux*.4)*sp*dt;if(e.timer<=0&&d<520){const n=e.mini?3:1;for(let i=0;i<n;i++)zone(P.x+(i?rand(-90,90):0),P.y+(i?rand(-90,90):0),e.mini?64:50,1.3,e.dmg,'meteor','#ffb347');e.aimA=Math.atan2(dy,dx);e.st='flee';e.timer=.8;sfx.eshoot()}}
   break;
  case 'vulture':
-  if(e.st==='walk'){const tx=-uy,ty=ux,pull=d>230?.6:d<190?-.6:0;e.x+=(tx+ux*pull)*sp*dt;e.y+=(ty+uy*pull)*sp*dt;if(e.timer<=0&&d<380){e.st='crouch';e.timer=e.mini?.7:.5}}
+  if(e.st==='walk'){const tx=-uy,ty=ux,pull=d>230?.6:d<190?-.6:0;e.x+=(tx+ux*pull)*sp*dt;e.y+=(ty+uy*pull)*sp*dt;if(e.timer<=0&&d<380){e.st='crouch';e.timer=e.mini?.95:.75}}
   else if(e.st==='crouch'){if(e.timer>.25)e.aimA=Math.atan2(dy,dx);if(e.timer<=0){e.st='lunge';e.timer=.45}}
-  else if(e.st==='lunge'){e.x+=Math.cos(e.aimA)*520*dt;e.y+=Math.sin(e.aimA)*520*dt;e.x=clamp(e.x,B.l+e.r,B.r-e.r);e.y=clamp(e.y,B.t+e.r,B.b-e.r);if(e.timer<=0){e.st='walk';e.timer=rand(2.2,3)}}
+  else if(e.st==='lunge'){e.x+=Math.cos(e.aimA)*430*dt;e.y+=Math.sin(e.aimA)*430*dt;e.x=clamp(e.x,B.l+e.r,B.r-e.r);e.y=clamp(e.y,B.t+e.r,B.b-e.r);if(e.timer<=0){e.st='walk';e.timer=rand(2.8,3.6)}}
   break;
  case 'cobra':
-  if(e.st==='walk'||e.st==='under'){e.st='under';e.under=true;e.x+=ux*sp*1.3*dt;e.y+=uy*sp*1.3*dt;if(Math.random()<.4)parts.push({x:e.x+rand(-10,10),y:e.y,vx:rand(-20,20),vy:-30,life:.4,max:.4,col:'rgba(201,165,82,.9)',s:rand(3,5),g:0});if(e.timer<=0&&d<320){e.st='up';e.under=false;e.timer=2.4;e.spit=.5;burst(e.x,e.y,['#c9a552','#e6c87a'],10,160)}}
-  else if(e.st==='up'){e.spit-=dt;if(e.spit<=0){e.spit=1.1;const a=Math.atan2(dy,dx),n=e.mini?7:5;for(let i=0;i<n;i++)shootE(e.x,e.y-30,a+(i-(n-1)/2)*.17,240,e.dmg,'#9be15d',7);sfx.eshoot()}if(e.timer<=0){e.st='under';e.under=true;e.timer=rand(1.6,2.4)}}
+  if(e.st==='walk'||e.st==='under'){e.st='under';e.under=true;e.x+=ux*sp*1.3*dt;e.y+=uy*sp*1.3*dt;if(Math.random()<.4)parts.push({x:e.x+rand(-10,10),y:e.y,vx:rand(-20,20),vy:-30,life:.4,max:.4,col:'rgba(201,165,82,.9)',s:rand(3,5),g:0});if(e.timer<=0&&d<320){e.st='up';e.under=false;e.timer=2.8;e.spit=.6;burst(e.x,e.y,['#c9a552','#e6c87a'],10,160)}}
+  else if(e.st==='up'){e.spit-=dt;if(e.spit<=0){e.spit=1.4;const a=Math.atan2(dy,dx),n=e.mini?5:3;for(let i=0;i<n;i++)shootE(e.x,e.y-30,a+(i-(n-1)/2)*.2,195,e.dmg,'#9be15d',7);sfx.eshoot()}if(e.timer<=0){e.st='under';e.under=true;e.timer=rand(1.6,2.4)}}
   break;
  case 'clone':{const bz=bossE;e.wob+=dt;if(!e.tx||Math.hypot(e.tx-e.x,e.ty-e.y)<20){e.tx=rand(B.l+80,B.r-80);e.ty=rand(B.t+100,B.b-120)}const vx=e.tx-e.x,vy=e.ty-e.y,vl=Math.hypot(vx,vy)||1;e.x+=vx/vl*50*dt;e.y+=vy/vl*50*dt;
   if(e.timer<=0){e.timer=rand(1.8,2.6);shootE(e.x,e.y-50,Math.atan2(dy,dx),190,e.dmg,'#c77dff',8)}if(!bz||bz.dead)e.dead=true;break}
  case 'scarab':
-  if(e.st==='walk'){e.x+=ux*sp*(e.shell?.5:1)*dt;e.y+=uy*sp*(e.shell?.5:1)*dt;if(e.timer<=0){e.phase=(e.phase+1)%3;e.st=['wind','spit','summon'][e.phase];e.timer=e.st==='wind'?.8:.5;e.aimA=Math.atan2(dy,dx)}}
+  if(e.st==='walk'){e.x+=ux*sp*(e.shell?.5:1)*dt;e.y+=uy*sp*(e.shell?.5:1)*dt;if(e.timer<=0){e.phase=(e.phase+1)%3;e.st=['wind','spit','summon'][e.phase];e.timer=e.st==='wind'?1.05:.5;e.aimA=Math.atan2(dy,dx)}}
   else if(e.st==='wind'){if(!e.shell)e.aimA=Math.atan2(dy,dx);if(e.timer<=0){e.st='charge';e.timer=.9;e.cvx=Math.cos(e.aimA)*480;e.cvy=Math.sin(e.aimA)*480}}
   else if(e.st==='charge'){e.x+=e.cvx*dt;e.y+=e.cvy*dt;if(e.x<=B.l+e.r||e.x>=B.r-e.r){e.cvx*=-1;shake=Math.max(shake,8)}if(e.y<=B.t+e.r*.5||e.y>=B.b-e.r*.3){e.cvy*=-1;shake=Math.max(shake,8)}if(e.timer<=0){e.st='walk';e.timer=1.3}}
   else if(e.st==='spit'){if(e.timer<=0){const a=e.shell?e.faceA:Math.atan2(dy,dx),n=enr?9:7;for(let i=0;i<n;i++)shootE(e.x,e.y-30,a+(i-(n-1)/2)*.15,250,Math.round(e.dmg*.6),'#d8c08a',8);sfx.eshoot();e.st='walk';e.timer=1.3}}
   else if(e.st==='summon'){if(e.timer<=0){if(enemies.length<10)for(let i=0;i<2;i++)spawnEnemy('scorp',clamp(e.x+rand(-70,70),B.l+20,B.r-20),clamp(e.y+rand(-70,70),B.t+20,B.b-20),false,{small:true});e.st='walk';e.timer=1.4}}
   e.x=clamp(e.x,B.l+e.r,B.r-e.r);e.y=clamp(e.y,B.t+e.r*.5,B.b-e.r*.3);if(!e.shell)e.faceA=Math.atan2(dy,dx);break;
  case 'worm':
-  if(e.st==='walk'||e.st==='under'){if(e.st==='walk'){e.st='under';e.timer=2.2}e.under=true;e.x+=ux*170*dt;e.y+=uy*170*dt;if(Math.random()<.7)parts.push({x:e.x+rand(-25,25),y:e.y+rand(-8,8),vx:rand(-40,40),vy:-40,life:.5,max:.5,col:'rgba(201,165,82,.9)',s:rand(4,8),g:0});if(e.timer<=0){e.st='rise';e.timer=.75;e.rx=P.x;e.ry=P.y;e.x=P.x;e.y=P.y}}
+  if(e.st==='walk'||e.st==='under'){if(e.st==='walk'){e.st='under';e.timer=2.2}e.under=true;e.x+=ux*170*dt;e.y+=uy*170*dt;if(Math.random()<.7)parts.push({x:e.x+rand(-25,25),y:e.y+rand(-8,8),vx:rand(-40,40),vy:-40,life:.5,max:.5,col:'rgba(201,165,82,.9)',s:rand(4,8),g:0});if(e.timer<=0){e.st='rise';e.timer=1.05;e.rx=P.x;e.ry=P.y;e.x=P.x;e.y=P.y}}
   else if(e.st==='rise'){if(e.timer<=0){e.under=false;e.st='up';e.timer=enr?4.5:5.5;e.shotT=.6;zone(e.x,e.y,90,.01,e.dmg*1.2,'meteor','#c9a552');ringShot(e,enr?16:12,190,Math.random(),'#d8c08a');sfx.boom();shake=Math.max(shake,12)}}
-  else if(e.st==='up'){e.shotT-=dt;if(e.shotT<=0){e.shotT=1.1;const a=Math.atan2(dy,dx);for(let i=-2;i<=2;i++)shootE(e.x,e.y-70,a+i*.16,260,Math.round(e.dmg*.6),'#d8c08a',8);sfx.eshoot()}if(e.timer<=0){e.st='under';e.timer=enr?1.3:1.7;burst(e.x,e.y,['#c9a552','#e6c87a'],20,200)}}
+  else if(e.st==='up'){e.shotT-=dt;if(e.shotT<=0){e.shotT=1.4;const a=Math.atan2(dy,dx);for(let i=-2;i<=2;i++)shootE(e.x,e.y-70,a+i*.16,205,Math.round(e.dmg*.6),'#d8c08a',8);sfx.eshoot()}if(e.timer<=0){e.st='under';e.timer=enr?1.3:1.7;burst(e.x,e.y,['#c9a552','#e6c87a'],20,200)}}
   e.x=clamp(e.x,B.l+e.r,B.r-e.r);e.y=clamp(e.y,B.t+e.r*.5,B.b-e.r*.3);break;
  case 'sphinx':
   if(e.st==='walk'){const tx=RW/2,ty=B.t+170;e.x+=(tx-e.x)*dt*.8;e.y+=(ty-e.y)*dt*.8;if(e.timer<=0){e.phase=(e.phase+1)%3;e.st=['gust','beams','wind'][e.phase];e.timer=e.st==='wind'?.8:.6;e.aimA=Math.atan2(dy,dx)}}
