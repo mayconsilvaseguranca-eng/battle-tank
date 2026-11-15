@@ -32,7 +32,19 @@ Roguelike de ação no navegador, para PC e celular. Você escolhe um herói, at
 | 35 | Lobo Alfa | 40 | Rei Ogro | Entrar no círculo seguro |
 | 45 | Zangão Gigante | 50 | Dragão Esmeralda | Todas as mecânicas juntas |
 
-Todo chefe também tem ataques que aparecem conforme a luta demora e entra em fúria se a luta passar de 2 a 3 minutos. Os mundos 2 a 5 estão em construção.
+## Mundo 2: Deserto Dourado
+
+Liberado ao vencer o Mundo 1. Cada partida começa no nível 1, só com a força da Forja.
+
+| Sala | Mini-chefe | Sala | Chefe | Mecânica principal |
+|---|---|---|---|---|
+| 5 | Bandido do Deserto | 10 | Golem Ancião | Chão que some: rachaduras viram buracos |
+| 15 | Rainha Escorpião | 20 | Escaravelho Rei | Escudo direcional: acertar as costas |
+| 25 | Abutre Gigante | 30 | Verme Colossal | Areia movediça que puxa para o centro |
+| 35 | Cobra Rainha | 40 | Esfinge do Vento | Tempestade fecha a arena: corrida contra o tempo |
+| 45 | Cavaleiro Negro | 50 | Faraó Amaldiçoado | Todas, mais a fase de clones (só o verdadeiro tem sombra) |
+
+Todo chefe também tem ataques que aparecem conforme a luta demora e entra em fúria se a luta passar de 2,5 a 3 minutos. Os mundos 3 a 5 estão em construção.
 
 ## Habilidades
 
