@@ -59,7 +59,7 @@ Liberado ao vencer o Mundo 2. Salas com poucos inimigos (2 a 4), cada um com ata
 ## Progresso fora da Forja (menu 🎒 Progresso)
 
 - Nível de cada herói (até 20), com passivas nos níveis 5, 10 e 15.
-- Equipamentos (arma, armadura, anel, amuleto) que caem de chefes e mini-chefes; 3 iguais viram 1 de raridade acima.
+- Itens no estilo Archero (menu 🗡️ Itens): 6 espaços (arma, armadura, 2 anéis, bracelete, amuleto), 5 raridades (Comum a Lendário), 3 modelos por tipo com efeito próprio a partir do Épico, fusão de 3 iguais e baús comprados com gemas.
 - Relíquias dos chefes finais e desafios com bônus permanentes.
 
 Os mundos 4 e 5 estão em construção.
