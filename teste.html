@@ -1245,7 +1245,8 @@ function banner(t,s,d){$('banT').textContent=t;$('banS').textContent=s||'';$('ba
 /* ================= COMBAT ================= */
 function addText(x,y,txt,col,sc){if(texts.length>(QL?40:18))texts.shift();texts.push({x:x+rand(-6,6),y,txt:String(txt),col,s:sc||1,t:.8})}
 function burst(x,y,col,n,sp,sz){if(parts.length>partCap())return;n=QL===2?n:QL===1?Math.ceil(n*.6):Math.ceil(n*.35);for(let i=0;i<n;i++){const a=Math.random()*TAU,v=rand(.3,1)*(sp||180);parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-40,life:rand(.35,.7),max:.7,col:Array.isArray(col)?pick(col):col,s:rand(3,6)*(sz||1),g:300})}}
-function hurtEnemy(e,amt,crit,dot){
+const SKKW=[1.6,2.1,2.15,2.15,2.15];
+function hurtEnemy(e,amt,crit,dot){amt*=SKKW[worldOf(run.room)];
  if(e.dead)return;
  if(e.fake){if(!dot&&(e.fakeTxt||0)<time){e.fakeTxt=time+.4;addText(e.x,e.y-90,'✖ FALSO','#c9b8ff',1)}return}
  if(e.shell){const sx=hitSrc?hitSrc.x:P.x,sy=hitSrc?hitSrc.y:P.y;let da=Math.atan2(sy-e.y,sx-e.x)-e.faceA;while(da>Math.PI)da-=TAU;while(da<-Math.PI)da+=TAU;if(Math.abs(da)<1.9){if((e.blkTxt||0)<time){e.blkTxt=time+.4;addText(e.x,e.y-e.r*2.4,'BLOQUEADO','#8fe3ff',.9)}return}}
@@ -1402,7 +1403,7 @@ function updHelpers(dt){
  for(const a of arcs)a.t-=dt;arcs=arcs.filter(a=>a.t>0);for(const l of lasers)l.t-=dt;lasers=lasers.filter(l=>l.t>0);
 }
 function gainXP(v){v*=1+.06*M.wis+(P.xpB||0);run.xp+=v;let need=xpNeed(run.lvl);while(run.xp>=need){run.xp-=need;run.lvl++;run.lvQ=(run.lvQ||0)+1;need=xpNeed(run.lvl)}}
-const xpNeed=l=>Math.round(2+l*1.6+l*l*.012);
+const xpNeed=l=>Math.round(6+l*3.4+l*l*.03);
 function explodeFire(b,direct,full){
  const R=P.splash;rings.push({x:b.x,y:b.y,r:8,max:R,t:.3,col:'#ffb347'});burst(b.x,b.y-10,['#ff7a2e','#ffd23f','#fff'],12,220);
  for(const e of enemies){if(!targetable(e)||e===direct)continue;if(Math.hypot(e.x-b.x,e.y-b.y)<R+e.r*.6){hurtEnemy(e,b.dmg*(full?1:.5),b.crit);applyElem(e,.5)}}
